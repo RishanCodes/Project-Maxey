@@ -338,8 +338,14 @@ function viewSchedule() {
   const sel = A.schedDay, evs = MX.eventsOn(st(), sel);
   const logs = st().logs.filter(function (l) { return l.date === sel; });
   const load = MX.dayLoad(st(), sel, k0, sel === k0 ? nowMin() : 1440);
+  const planDays = days.filter(function (d) { return d >= k0; });
+  const plans = st().plans || {};
+  const selPlan = plans[sel];
+  const weekPlanned = days.filter(function (d) { return plans[d]; });
   return h('div', { class: 'wrap' },
-    h('div', { class: 'row between' }, h('h1', null, 'Schedule'), h('button', { class: 'btn sm primary', id: 'add-event', onclick: function () { eventEditor(null, sel); } }, icon('plus', 18), 'Add')),
+    h('div', { class: 'row between' }, h('h1', null, 'Schedule'), h('div', { class: 'row nowrap' },
+      h('button', { class: 'btn sm', id: 'build-week', disabled: !planDays.length ? true : null, onclick: function () { weekBuilderSheet(planDays); } }, 'Build week'),
+      h('button', { class: 'btn sm primary', id: 'add-event', onclick: function () { eventEditor(null, sel); } }, icon('plus', 18), 'Add'))),
     h('div', { class: 'row between nowrap' },
       h('button', { class: 'iconbtn', 'aria-label': 'Previous week', onclick: function () { A.weekOffset--; A.schedDay = MX.addDays(ws, -7); render(); } }, icon('left', 18)),
       h('b', { class: 'small' }, MX.parseKey(ws).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' – ' + MX.parseKey(days[6]).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })),
@@ -348,7 +354,7 @@ function viewSchedule() {
       const e = MX.eventsOn(st(), d).filter(function (x) { return x.type !== 'school'; });
       return h('button', { role: 'tab', class: d === k0 ? 'today' : '', 'aria-selected': d === sel ? 'true' : 'false', onclick: function () { A.schedDay = d; render(); } },
         MX.DAY_NAMES[MX.dow(d)], h('b', null, String(MX.parseKey(d).getDate())),
-        h('span', { class: 'dots' }, e.slice(0, 4).map(function (x) { return h('i', { style: { background: evColor(x.type) } }); })));
+        h('span', { class: 'dots' }, e.slice(0, 3).map(function (x) { return h('i', { style: { background: evColor(x.type) } }); }), plans[d] ? h('i', { title: 'Planned', style: { background: 'transparent', boxShadow: 'inset 0 0 0 1.5px var(--cyan)' } }) : null));
     })),
     h('div', { class: 'card' },
       h('div', { class: 'row between' }, h('h3', null, relDay(sel) === fmtDate(sel) ? fmtDate(sel) : relDay(sel) + ' · ' + fmtDate(sel)), load.total ? h('span', { class: 'tag ' + (load.total >= 5 ? 'warn' : 'blue') }, 'Load ' + load.total.toFixed(1)) : null),
@@ -358,6 +364,19 @@ function viewSchedule() {
           icon('edit', 16));
       })) : h('p', { class: 'muted small' }, 'Nothing scheduled. A free day.'),
       logs.length ? h('div', { class: 'stack', style: { gap: '4px' } }, h('div', { class: 'eyebrow' }, 'Logged'), logs.map(function (l) { const sm = logSummary(l); return h('div', { class: 'small' }, '✓ ' + sm.name + ' · ' + sm.res); })) : null),
+    selPlan ? planCard(selPlan, {}) : (sel >= k0 ? h('div', { class: 'card' }, h('div', { class: 'row between' }, h('h3', null, 'No plan for this day'),
+      h('div', { class: 'row nowrap' }, h('button', { class: 'btn sm', id: 'plan-day', onclick: function () { rebuildDay(sel, {}); } }, 'Plan this day'), h('button', { class: 'btn sm ghost', onclick: function () { rebuildDay(sel, { rest: true }); } }, 'Rest day')))) : null),
+    weekPlanned.length ? h('div', { class: 'card', id: 'week-overview' },
+      h('div', { class: 'row between' }, h('h3', null, 'This week\'s plan'), h('span', { class: 'xs muted' }, plural(weekPlanned.length, 'day') + ' planned')),
+      A.weekNotes && A.weekNotes.length ? h('div', { class: 'note' }, A.weekNotes.join(' ')) : null,
+      h('div', { class: 'list' }, weekPlanned.map(function (d) {
+        const pl = plans[d], doneN = pl.blocks.filter(function (b) { return MX.blockDone(st(), b); }).length;
+        const names = pl.blocks.filter(function (b) { return b.kind !== 'warmup' && b.kind !== 'cooldown'; }).map(MX.blockName);
+        return h('button', { class: 'item', onclick: function () { A.schedDay = d; render(); } },
+          h('b', { style: { width: '36px' }, class: 'small' }, MX.DAY_NAMES[MX.dow(d)]),
+          h('div', { class: 'grow' }, h('div', { class: 'title small' }, planTitle(pl) + (pl.kind === 'session' ? ' · ' + MX.focusLabel(P(), pl.focus) : '')), h('div', { class: 'xs muted' }, names.length ? names.join(' · ') : 'Recovery')),
+          pl.blocks.length ? h('span', { class: 'tag ' + (doneN === pl.blocks.length ? 'good' : '') + ' tnum' }, doneN + '/' + pl.blocks.length) : null);
+      }))) : null,
     h('div', { class: 'section-title' }, h('h2', null, 'Facilities by day')),
     h('div', { class: 'card' }, [1, 2, 3, 4, 5, 6, 0].map(function (d) {
       const k = days[(d + 6) % 7];

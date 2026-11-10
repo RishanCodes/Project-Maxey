@@ -46,7 +46,7 @@
     return {
       v: 1, createdAt: Date.now(), updatedAt: Date.now(), onboarded: false, obStep: 0,
       profile: MX.defaultProfile(), schedule: { events: events, skips: {} }, logs: [], readiness: {},
-      insights: {}, prefs: { title: '', tree: 'sep', zoom: 1 }, today: null
+      insights: {}, prefs: { title: '', tree: 'sep', zoom: 1, focus: { mode: 'balanced' } }, today: null, plans: {}
     };
   };
   MX.migrate = function (s) {
@@ -57,6 +57,8 @@
     out.schedule = Object.assign({ events: [], skips: {} }, s.schedule || {});
     out.logs = Array.isArray(s.logs) ? s.logs.filter(function (l) { return l && l.id && l.date; }) : [];
     out.readiness = s.readiness || {}; out.insights = s.insights || {}; out.prefs = Object.assign(d.prefs, s.prefs || {});
+    out.plans = s.plans && typeof s.plans === 'object' && !Array.isArray(s.plans) ? s.plans : {};
+    if (out.today && !out.today.focus) out.today.focus = out.prefs.focus;
     return out;
   };
 
@@ -678,6 +680,14 @@
       missions.unshift({ kind: 'mission', id: pool[0].id, q: pool[0], event: gameToday, why: ['Game today (' + MX.fmtTime(gameToday.start) + '). This is where drill work becomes game application.'] });
     }
     cands.sort(function (a, b) { return b.score - a.score; });
+    // Workout focus: a single-skill focus keeps only work that mainly trains that skill (no forced variety).
+    let focusFallback = null;
+    const fsk = MX.focusSkill ? MX.focusSkill(p, ctx.focus) : null;
+    if (fsk) {
+      const keepF = cands.filter(function (c) { return MX.candSkillWeight(c, fsk) >= 0.5 || (c.q && c.q.type === 'recovery' && maxLoad === 0); });
+      if (keepF.some(function (c) { return !(c.q && c.q.type === 'recovery'); }) || maxLoad === 0) { cands.length = 0; keepF.forEach(function (c) { cands.push(c); }); }
+      else focusFallback = 'No ' + MX.SKILLS[fsk].name.toLowerCase() + ' work fits today\'s limits, so other options are shown.';
+    }
 
     // rest option is always available and never penalized
     const rest = { kind: 'quest', id: 'rec-rest', q: MX.QUEST['rec-rest'], score: 0, why: ['Rest is a valid choice any day. There is no streak to protect.'] };
@@ -701,7 +711,8 @@
     }
     if (!fac.hasCourt && ctx.loc === 'auto') reasonsGlobal.push('No court access on your schedule today, so only home, field or weight-room options are shown.');
     if (!fac.hasGym && ctx.loc === 'auto' && p.gymAccess) reasonsGlobal.push('The weight room is not open on your schedule today.');
-    return { main: main, alts: alts.slice(0, 3), notes: notes, context: reasonsGlobal, all: cands, missions: missions, caps: { maxLoad: maxLoad, maxLegs: maxLegs, recent: recent }, spaces: spaces, insights: ins, mix: mix, targets: targets };
+    if (focusFallback) reasonsGlobal.unshift(focusFallback);
+    return { flags: { gameTomorrow: !!gameTomorrow, gameLater: !!gameLater, practiceLater: !!practiceLater }, focusFallback: focusFallback, main: main, alts: alts.slice(0, 3), notes: notes, context: reasonsGlobal, all: cands, missions: missions, caps: { maxLoad: maxLoad, maxLegs: maxLegs, recent: recent }, spaces: spaces, insights: ins, mix: mix, targets: targets };
   };
 
   /* ---------- integrity checks (also run by tests and shown in Profile > Diagnostics) ---------- */

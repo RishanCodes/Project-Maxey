@@ -1,7 +1,7 @@
 // Bundles src/ into a single self-contained artifact page: dist/index.html
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 const r = (f) => readFileSync(new URL('./src/' + f, import.meta.url), 'utf8');
-const lib = ['data-trees.js', 'data-quests.js', 'data-gym.js', 'engine.js', 'store.js'].map(r).join('\n');
+const lib = ['data-trees.js', 'data-quests.js', 'data-gym.js', 'engine.js', 'planner.js', 'store.js'].map(r).join('\n');
 const ui = ['ui-a.js', 'ui-b.js', 'ui-c.js'].map(r).join('\n');
 const html = `<title>Project Maxey: Ascension</title>
 <meta name="claude:viewport-fit-sides" content="cover">

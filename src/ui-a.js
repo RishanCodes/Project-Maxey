@@ -178,7 +178,8 @@ function commit() { S.save(); render(); sheets.forEach(function (x) { x.refresh(
 
 function todayCtx() {
   const s0 = st(), k = today();
-  if (!s0.today || s0.today.date !== k) s0.today = { date: k, minutes: P().duration || 45, loc: 'auto', partner: P().partner === 'often' };
+  if (!s0.today || s0.today.date !== k) s0.today = { date: k, minutes: P().duration || 45, loc: 'auto', partner: P().partner === 'often', focus: s0.prefs.focus || { mode: 'balanced' } };
+  if (!s0.today.focus) s0.today.focus = s0.prefs.focus || { mode: 'balanced' };
   return s0.today;
 }
 

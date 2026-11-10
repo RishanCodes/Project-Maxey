@@ -34,6 +34,29 @@ const file = path.join(out, 'page.html'); fs.writeFileSync(file, html);
   else if (await page.$('#log-gym')) { await shot('gym'); await page.click('#log-gym'); }
   else { const b = await page.$('#log-quest'); if (b) await b.click(); }
   await page.waitForSelector('#reward-ok'); await shot('reward'); await page.click('#reward-ok'); ok('recommended activity logged');
+  // session builder with a focus
+  await page.click('#app .chip:has-text("Secondary:")'); await page.waitForTimeout(40);
+  await page.click('#build-session'); await page.waitForSelector('#today-plan'); await overflow('today plan'); await shot('today-plan');
+  await page.locator('#today-plan').screenshot({ path: path.join(out, 'today-plan-card.png') });
+  let blocksN = await page.locator('#today-plan [data-block]').count();
+  if (blocksN < 1) {
+    const txt = await page.textContent('#today-plan'); if (!/No shooting work fits/.test(txt)) throw new Error('empty focus plan without explanation');
+    ok('focus with nothing available explains why');
+    await page.click('#app .chip:has-text("Balanced")'); await page.click('#build-session'); await page.waitForSelector('#today-plan');
+    blocksN = await page.locator('#today-plan [data-block]').count(); if (blocksN < 1) throw new Error('no plan blocks');
+  }
+  const warm = page.locator('#today-plan [data-block]:has-text("Warm-up") button:has-text("Open")');
+  if (await warm.count()) { await warm.click(); await page.click('#mark-done'); }
+  const startBtn = page.locator('#today-plan button:has-text("Start")').first();
+  if (await startBtn.count()) {
+    await startBtn.click(); await page.waitForTimeout(80);
+    if (await page.$('#tap-make')) { await page.click('#tap-make'); await page.click('#tap-miss'); await page.click('#log-quest'); }
+    else if (await page.$('#log-gym')) await page.click('#log-gym');
+    await page.waitForSelector('#reward-ok'); await page.click('#reward-ok');
+  }
+  const prog = await page.textContent('#today-plan .tag'); if (!/^[1-9]\d*\//.test(prog.trim())) throw new Error('plan progress not updated: ' + prog);
+  const swap = page.locator('#today-plan button:has-text("Swap")').first(); if (await swap.count()) { await swap.click(); await page.waitForSelector('.sheet'); const opt = page.locator('.sheet .item').first(); if (await opt.count()) await opt.click(); else await page.click('.sheet .iconbtn'); }
+  ok('session built with focus, block logged (' + prog.trim() + '), swap works');
   // log a specific quest from the library
   await page.click('nav button:has-text("Train")'); await page.waitForTimeout(50); await overflow('train');
   await shot('train');
@@ -70,20 +93,32 @@ const file = path.join(out, 'page.html'); fs.writeFileSync(file, html);
   await page.click('#add-event'); await page.fill('#ev-title', 'Tournament'); await page.click('.sheet .chip:has-text("One time")'); await page.click('#ev-save'); await page.waitForTimeout(50);
   const sch = await page.textContent('#app'); if (!/Tournament/.test(sch)) throw new Error('event not added'); ok('event added');
   await page.click('.evrow:has-text("Tournament")'); await page.click('.sheet .btn.danger'); ok('event deleted');
+  // week builder
+  await page.click('#build-week'); await page.waitForSelector('#week-go'); await shot('week-sheet'); await page.click('#week-go'); await page.waitForSelector('#week-overview');
+  await overflow('week plan'); await shot('week-overview');
+  await page.locator('#week-overview').screenshot({ path: path.join(out, 'week-overview-card.png') });
+  const rows = await page.locator('#week-overview .item').count(); if (rows < 1) throw new Error('no week rows');
+  await page.locator('#week-overview .item').last().click(); await page.waitForTimeout(40);
+  if (await page.$('#make-rest')) { await page.click('#make-rest'); await page.waitForTimeout(40); if (!/Rest day/.test(await page.textContent('#day-plan'))) throw new Error('make rest failed'); await page.click('#day-plan button:has-text("Plan training instead")'); }
+  await page.click('#day-plan .chip:has-text("Balanced")'); await page.waitForTimeout(40); await page.click('#day-rebuild'); await page.waitForSelector('#day-plan');
+  await page.locator('#day-plan').screenshot({ path: path.join(out, 'day-plan-card.png') });
+  ok('week built (' + rows + ' days) and a day edited');
   // profile
   await page.click('nav button:has-text("Profile")'); await overflow('profile'); await shot('profile');
   await page.click('#edit-spec'); await page.click('.sheet .tile:has-text("Finishing")'); await page.click('.sheet .iconbtn'); ok('specialization edited');
   await page.click('#btn-export'); const exp = await page.inputValue('#export-text'); if (!exp.includes('project-maxey-ascension')) throw new Error('export missing'); await page.click('.sheet .iconbtn'); ok('export works');
   await page.click('#btn-import'); await page.fill('#import-text', exp); await page.click('#import-check'); await page.waitForSelector('#import-go'); await page.click('#import-go'); ok('import works');
   // persistence across reload
+  const plansBefore = await page.evaluate(() => Object.keys(MX.Store.state.plans || {}).length);
   const before = await page.evaluate(() => MX.Store.state.logs.length);
-  await page.reload(); await page.waitForSelector('#start-quest');
+  await page.reload(); await page.waitForSelector('nav.nav');
   const after = await page.evaluate(() => MX.Store.state.logs.length);
   if (before !== after || before < 5) throw new Error('persistence: ' + before + ' vs ' + after); ok('reload restores ' + after + ' logs and skips onboarding');
+  const plansAfter = await page.evaluate(() => Object.keys(MX.Store.state.plans || {}).length); if (plansAfter !== plansBefore) throw new Error('plans not persisted ' + plansBefore + ' vs ' + plansAfter); ok('reload restores ' + plansAfter + ' plans');
   // legacy (pre-update) save through the real Import screen
   const legacy = fs.readFileSync(path.join(__dirname, 'fixtures', 'v1-save.json'), 'utf8');
   await page.click('nav button:has-text("Profile")'); await page.click('#btn-import'); await page.fill('#import-text', legacy); await page.click('#import-check'); await page.waitForSelector('#import-go'); await page.click('#import-go');
-  await page.reload(); await page.waitForSelector('#start-quest');
+  await page.reload(); await page.waitForSelector('nav.nav');
   const lv = await page.evaluate(() => MX.progress(MX.Store.state, '2026-09-20').level.level); if (lv < 12) throw new Error('legacy level ' + lv);
   await page.click('nav button:has-text("Progress")'); await page.click('.seg button:has-text("Skill trees")'); await page.click('.chips.scroll .chip:has-text("Finishing")'); await overflow('legacy finishing tree');
   await page.locator('#treewrap').screenshot({ path: path.join(out, 'tree-legacy.png') }); ok('legacy save imports, survives reload, level ' + lv);

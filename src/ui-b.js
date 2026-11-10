@@ -6,12 +6,14 @@ const KIND_LABEL = { skill: 'Skill quest', boss: 'Boss challenge', team: 'Practi
 
 function viewHome() {
   const k = today(), s0 = st(), prog = MX.progress(s0, k), ctx = todayCtx();
-  const rec = MX.recommend(s0, { key: k, nowMin: nowMin(), minutes: ctx.minutes, loc: ctx.loc, partner: ctx.partner });
+  const rec = MX.recommend(s0, { key: k, nowMin: nowMin(), minutes: ctx.minutes, loc: ctx.loc, partner: ctx.partner, focus: ctx.focus });
+  const plan = (s0.plans || {})[k];
   return h('div', { class: 'wrap' },
     header(prog),
     readinessCard(k),
     setupCard(k, ctx),
-    recCard(rec),
+    plan ? planCard(plan, { home: true }) : null,
+    plan && plan.kind !== 'rest' && !A.showSingle ? h('button', { class: 'link', style: { alignSelf: 'flex-start' }, onclick: function () { A.showSingle = true; render(); } }, 'Prefer a single quest? Show the recommendation') : recCard(rec),
     insightsCard(rec.insights.slice(0, 2)),
     focusCard(rec),
     recentCard(prog, k),
@@ -58,7 +60,10 @@ function setupCard(k, ctx) {
     h('div', { class: 'chips scroll' }, [15, 20, 30, 45, 60, 90].map(function (m) { return chip(m + ' min', ctx.minutes === m, function () { upd('minutes', m); }); })),
     h('div', { class: 'chips scroll' },
       [['auto', 'Use my schedule'], ['court', 'At a court'], ['gym', 'Weight room'], ['home', 'At home']].map(function (o) { return chip(o[1], ctx.loc === o[0], function () { upd('loc', o[0]); }); }),
-      chip(ctx.partner ? 'Partner with me' : 'Training solo', ctx.partner, function () { upd('partner', !ctx.partner); })));
+      chip(ctx.partner ? 'Partner with me' : 'Training solo', ctx.partner, function () { upd('partner', !ctx.partner); })),
+    h('div', { class: 'eyebrow' }, 'Workout focus'),
+    focusPicker(ctx.focus, function (f) { ctx.focus = f; st().prefs.focus = f; commit(); }),
+    h('button', { class: 'btn block', id: 'build-session', onclick: buildToday }, icon('plus', 18), ((st().plans || {})[k] ? 'Rebuild' : 'Build') + ' a full ' + ctx.minutes + '-min session'));
 }
 
 function candMeta(c) {
@@ -72,11 +77,12 @@ function candMeta(c) {
 }
 function candKind(c) { return c.kind === 'gym' ? 'Weight room' : KIND_LABEL[c.q.type] || 'Skill quest'; }
 function candName(c) { return c.kind === 'gym' ? c.w.name : c.q.name; }
-function startCandidate(c) {
-  if (c.kind === 'gym') return openGymRun(c.w);
-  if (c.kind === 'mission' || c.q.type === 'team' || c.q.type === 'game') return openReport({ mission: c.q, context: c.q.type === 'game' ? 'game' : 'practice' });
+function startCandidate(c, opts) {
+  opts = opts || {};
+  if (c.kind === 'gym') return openGymRun(c.w, opts);
+  if (c.kind === 'mission' || c.q.type === 'team' || c.q.type === 'game') return openReport({ mission: c.q, context: c.q.type === 'game' ? 'game' : 'practice', plan: opts.plan });
   if (c.q.id === 'rec-rest') return logRest();
-  return openQuestRun(c.q);
+  return openQuestRun(c.q, opts);
 }
 function recCard(rec) {
   const m = rec.main;
@@ -241,6 +247,7 @@ function openQuestRun(q, opts) {
       return [h('button', { class: 'btn ghost', onclick: function () { closeSheet(); } }, 'Cancel'),
         h('button', { class: 'btn primary grow', id: 'log-quest', onclick: function () {
           const log = { id: MX.uid(), kind: 'quest', qid: q.id, date: today(), ts: Date.now(), dur: q.dur ? run.dur : 0, notes: run.notes.trim() };
+          if (opts.plan) log.plan = opts.plan;
           if (m.kind === 'makes' && run.att > 0) { log.makes = run.makes; log.att = run.att; }
           if (m.kind === 'rating' && run.rating) log.rating = run.rating;
           if (opts.testOut) log.testOut = opts.testOut;
@@ -341,6 +348,7 @@ function openReport(opts) {
         const reports = skills.filter(function (k) { return r.items[k].result; }).map(function (k) { return { skill: k, result: r.items[k].result, node: r.items[k].node || null }; });
         if (!reports.length) { toast('Rate at least one skill, or cancel'); return; }
         const log = { id: MX.uid(), kind: 'game', date: today(), ts: Date.now(), context: r.context, reports: reports, notes: r.notes.trim(), mission: mission ? mission.id : null };
+        if (opts.plan) log.plan = opts.plan;
         const sh = parseInt(r.shots, 10), md = parseInt(r.made, 10);
         if (sh > 0) { log.shots = sh; log.made = Math.min(sh, Math.max(0, md || 0)); }
         logAndReward(log, function () { return 'Game application recorded separately from drill results: ' + reports.length + ' skill' + (reports.length > 1 ? 's' : '') + ' reported.'; });
@@ -381,7 +389,8 @@ function workoutDetail(w) {
   });
 }
 function lastGymLog(wid) { return st().logs.filter(function (l) { return l.kind === 'gym' && l.wid === wid; }).sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : (b.ts || 0) - (a.ts || 0); })[0]; }
-function openGymRun(w) {
+function openGymRun(w, opts) {
+  opts = opts || {};
   const r = MX.resolveWorkout(st(), w);
   if (!r.ok) { workoutDetail(w); return; }
   const run = { ex: r.items.map(function (it) { return { id: it.id, sets: it.sets, reps: it.reps, load: '', tech: 'okay', done: true }; }), rpe: null, dur: w.dur, notes: '' };
@@ -421,6 +430,7 @@ function openGymRun(w) {
         const done = run.ex.filter(function (x) { return x.done; });
         if (!done.length) { toast('Mark at least one exercise done'); return; }
         const log = { id: MX.uid(), kind: 'gym', wid: w.id, date: today(), ts: Date.now(), dur: run.dur, rpe: run.rpe, notes: run.notes.trim(), ex: run.ex.map(function (x) { return { id: x.id, sets: x.sets, reps: x.reps, load: x.load, tech: x.tech, done: x.done }; }) };
+        if (opts.plan) log.plan = opts.plan;
         logAndReward(log, function () { const solid = done.filter(function (x) { return x.tech === 'solid'; }).length; return done.length + ' exercises logged, ' + solid + ' with solid technique. Strength nodes move on solid-technique sessions, not on load.'; });
       } }, 'Log workout')];
     }
@@ -440,5 +450,132 @@ function openCustomWorkout() {
     foot: function () { return [h('button', { class: 'btn ghost', onclick: function () { closeSheet(); } }, 'Cancel'), h('button', { class: 'btn primary grow', id: 'log-custom', onclick: function () {
       logAndReward({ id: MX.uid(), kind: 'custom', date: today(), ts: Date.now(), name: c.name.trim() || 'Coach-assigned workout', dur: c.dur, legs: c.legs, load: c.legs === 'heavy' ? 3 : c.legs === 'moderate' ? 2 : 1, rpe: c.rpe, notes: c.notes.trim() }, function () { return 'Coach workout recorded and counted in your training load.'; });
     } }, 'Log workout')]; }
+  });
+}
+
+/* ---------- workout focus, session builder, day plans ---------- */
+function focusPicker(focus, onChange) {
+  const p = P(); focus = focus || { mode: 'balanced' };
+  return h('div', { class: 'stack', style: { gap: '6px' } },
+    h('div', { class: 'chips scroll' },
+      chip('Balanced', focus.mode === 'balanced', function () { onChange({ mode: 'balanced' }); }),
+      chip('Primary: ' + MX.SKILLS[p.primary].name, focus.mode === 'primary', function () { onChange({ mode: 'primary' }); }),
+      chip('Secondary: ' + MX.SKILLS[p.secondary].name, focus.mode === 'secondary', function () { onChange({ mode: 'secondary' }); }),
+      chip('One skill…', focus.mode === 'skill', function () { onChange({ mode: 'skill', skill: focus.skill || MX.SKILL_KEYS.find(function (k) { return k !== p.primary && k !== p.secondary; }) }); })),
+    focus.mode === 'skill' ? h('div', { class: 'chips scroll' }, MX.SKILL_KEYS.map(function (k) { return chip(MX.SKILLS[k].name, focus.skill === k, function () { onChange({ mode: 'skill', skill: k }); }); })) : null,
+    h('div', { class: 'xs muted' }, focus.mode === 'balanced' ? 'Mixes your primary, secondary and maintenance work (about 45/25/30).' : 'Only work that mainly trains ' + MX.focusLabel(p, focus).replace(' only', '').toLowerCase() + '. Safety, load and schedule rules still apply.'));
+}
+function keptBlocks(key) { const old = (st().plans || {})[key]; return old ? old.blocks.filter(function (b) { return MX.blockDone(st(), b); }) : []; }
+function buildToday() {
+  const s0 = st(), k = today(), ctx = todayCtx();
+  const plan = MX.buildSession(s0, { key: k, nowMin: nowMin(), minutes: ctx.minutes, loc: ctx.loc, partner: ctx.partner, focus: ctx.focus, keep: keptBlocks(k) });
+  plan.slot = MX.planSlot(s0, plan);
+  s0.plans = s0.plans || {}; s0.plans[k] = plan; MX.prunePlans(s0, k);
+  A.showSingle = false; commit();
+  toast(plan.blocks.some(function (b) { return b.kind === 'quest' || b.kind === 'gym'; }) ? 'Session built: ' + plan.blocks.length + ' blocks' : 'Nothing fits that focus here today. See the note.');
+}
+function rebuildDay(key, o) {
+  const s0 = st(), old = (s0.plans || {})[key], isToday = key === today();
+  const focus = o.focus || (old && old.focus) || s0.prefs.focus || { mode: 'balanced' };
+  const partner = o.partner != null ? o.partner : old ? !!old.partner : (isToday ? todayCtx().partner : P().partner === 'often');
+  const keep = keptBlocks(key);
+  const strengthDay = o.strengthDay != null ? o.strengthDay : !!(old && old.blocks.some(function (b) { return b.kind === 'gym' || MX.blockCat(b) === 'athletic'; }));
+  const plan = MX.planDay(s0, key, { todayKey: today(), nowMin: nowMin(), focus: focus, partner: partner, rest: !!o.rest, minutes: o.minutes || (old && old.kind === 'session' ? old.minutes : null), keep: keep, strengthDay: strengthDay });
+  if (plan.kind !== 'session') keep.forEach(function (b) { if (!plan.blocks.some(function (x) { return x.id === b.id; })) plan.blocks.unshift(b); });
+  s0.plans = s0.plans || {}; s0.plans[key] = plan; MX.prunePlans(s0, today());
+  commit();
+}
+function planTitle(plan) {
+  const total = plan.blocks.reduce(function (t, b) { return t + (b.dur || 0); }, 0);
+  if ((plan.kind === 'session' || plan.kind === 'recovery') && !plan.blocks.some(function (b) { return b.kind === 'quest' || b.kind === 'gym'; })) return 'No session fits';
+  return plan.kind === 'rest' ? 'Rest day' : plan.kind === 'game' ? 'Game day' : plan.kind === 'practice' ? 'Practice day' : plan.kind === 'recovery' ? total + '-min recovery session' : total + '-min session';
+}
+const CAT_LABEL = { warmup: 'Warm-up', cooldown: 'Cool-down', athletic: 'Explosiveness', skill: 'Skill', cond: 'Conditioning', gym: 'Weight room', recovery: 'Recovery', mission: 'Mission' };
+function planCard(plan, opts) {
+  const s0 = st(), k = today(), isToday = plan.date === k, editable = !opts.home && plan.date >= k;
+  const done = plan.blocks.filter(function (b) { return MX.blockDone(s0, b); }).length;
+  const work = plan.blocks.filter(function (b) { return b.kind !== 'warmup' && b.kind !== 'cooldown'; });
+  return h('div', { class: 'card' + (opts.home ? ' hero' : ''), id: opts.home ? 'today-plan' : 'day-plan' },
+    h('div', { class: 'row between nowrap' }, h('div', { style: { minWidth: 0 } },
+      h('div', { class: 'eyebrow' }, (opts.home ? 'Today\'s plan' : 'Plan') + ' · ' + MX.focusLabel(P(), plan.focus)),
+      h('h2', { style: { fontSize: '24px' } }, planTitle(plan)),
+      h('div', { class: 'muted small' }, plan.slot && plan.blocks.length ? plan.slot.label : '')),
+      plan.blocks.length ? h('span', { class: 'tag ' + (done === plan.blocks.length ? 'good' : 'blue') + ' tnum' }, done + '/' + plan.blocks.length + ' done') : null),
+    plan.notes && plan.notes.length ? h('div', { class: 'note' }, plan.notes.join(' ')) : null,
+    plan.blocks.length ? h('div', { class: 'list' }, plan.blocks.map(function (b, i) {
+      const isDone = MX.blockDone(s0, b), cat = MX.blockCat(b);
+      const swappable = !isDone && editableBlock(b) && plan.date >= k;
+      return h('div', { class: 'item', style: { alignItems: 'flex-start', opacity: isDone ? 0.6 : 1 }, 'data-block': b.id },
+        h('span', { class: 'skillicon', style: { width: '30px', height: '30px', color: isDone ? 'var(--good)' : 'var(--muted)' } }, isDone ? icon('check', 18) : h('b', { class: 'tnum small' }, String(i + 1))),
+        h('div', { class: 'grow' },
+          h('div', { class: 'title small' }, MX.blockName(b)),
+          h('div', { class: 'xs muted' }, [b.dur ? b.dur + ' min' : null, CAT_LABEL[cat], b.optional ? 'optional' : null].filter(Boolean).join(' · ')),
+          b.why && b.why[0] ? h('div', { class: 'xs muted' }, b.why[0]) : null,
+          h('div', { class: 'row', style: { marginTop: '6px', gap: '6px' } },
+            isToday && !isDone ? h('button', { class: 'btn sm primary', onclick: function () { startBlock(plan, b); } }, b.kind === 'mission' ? 'Report' : b.kind === 'warmup' || b.kind === 'cooldown' ? 'Open' : 'Start') : null,
+            !isToday && !isDone ? h('button', { class: 'btn sm ghost', onclick: function () { blockInfo(b); } }, 'Details') : null,
+            swappable ? h('button', { class: 'btn sm ghost', onclick: function () { swapSheet(plan, b); } }, 'Swap') : null,
+            !isDone && plan.date >= k && b.kind !== 'mission' ? h('button', { class: 'btn sm ghost', 'aria-label': 'Remove ' + MX.blockName(b), onclick: function () { MX.removeBlock(plan, b.id); commit(); } }, 'Remove') : null)));
+    })) : null,
+    plan.unused >= 8 && work.length ? h('p', { class: 'xs muted' }, plan.unused + ' minutes unplanned.') : null,
+    editable ? h('div', { class: 'stack', style: { gap: '8px' } },
+      h('div', { class: 'eyebrow' }, 'Focus for this day'),
+      focusPicker(plan.focus, function (f) { rebuildDay(plan.date, { focus: f }); }),
+      plan.kind === 'session' || plan.kind === 'recovery' ? h('div', { class: 'chips scroll' }, [20, 30, 45, 60, 75, 90].map(function (m) { return chip(m + ' min', plan.minutes === m, function () { rebuildDay(plan.date, { minutes: m }); }); })) : null) : null,
+    h('div', { class: 'row' },
+      plan.date >= k ? h('button', { class: 'btn sm', id: opts.home ? 'plan-rebuild' : 'day-rebuild', onclick: function () { if (opts.home) buildToday(); else rebuildDay(plan.date, {}); } }, 'Rebuild') : null,
+      editable ? (plan.kind === 'rest' ? h('button', { class: 'btn sm', onclick: function () { rebuildDay(plan.date, { rest: false }); } }, 'Plan training instead') : h('button', { class: 'btn sm', id: 'make-rest', onclick: function () { rebuildDay(plan.date, { rest: true }); } }, 'Make it a rest day')) : null,
+      opts.home && plan.kind === 'rest' ? h('button', { class: 'btn sm', onclick: buildToday }, 'Train today instead') : null,
+      opts.home && plan.kind === 'rest' ? h('button', { class: 'btn sm primary', onclick: logRest }, 'Log rest day') : null,
+      plan.date >= k ? h('button', { class: 'btn sm ghost', onclick: function () { delete st().plans[plan.date]; commit(); toast('Plan cleared'); } }, 'Clear') : null));
+}
+function editableBlock(b) { return b.kind === 'quest' || b.kind === 'gym'; }
+function startBlock(plan, b) {
+  if (b.kind === 'warmup' || b.kind === 'cooldown') return stepsSheet(b);
+  if (b.kind === 'gym') return openGymRun(MX.WORKOUT[b.ref], { plan: b.id });
+  if (b.kind === 'mission') { const q = MX.QUEST[b.ref]; return openReport({ mission: q, context: q.type === 'game' ? 'game' : 'practice', plan: b.id }); }
+  return openQuestRun(MX.QUEST[b.ref], { plan: b.id });
+}
+function blockInfo(b) {
+  if (b.kind === 'warmup' || b.kind === 'cooldown') return stepsSheet(b, true);
+  if (b.kind === 'gym') return workoutDetail(MX.WORKOUT[b.ref]);
+  return questDetail(MX.QUEST[b.ref], b.why);
+}
+function stepsSheet(b, readOnly) {
+  openSheet({ eyebrow: CAT_LABEL[b.kind], title: MX.blockName(b) + ' · ' + b.dur + ' min',
+    body: function () { return [h('ol', { class: 'steps' }, (b.steps || []).map(function (x) { return h('li', null, x); })), h('p', { class: 'xs muted' }, (b.why || [])[0] || '')]; },
+    foot: readOnly ? null : function () { return h('button', { class: 'btn primary block', id: 'mark-done', onclick: function () { b.done = true; closeSheet(); commit(); } }, 'Mark done'); } });
+}
+function swapSheet(plan, b) {
+  const opts = MX.swapOptions(st(), plan, b.id, today(), nowMin());
+  openSheet({ eyebrow: 'Swap block', title: 'Replace ' + MX.blockName(b), sub: 'Options that fit the same time, place and limits' + (MX.focusSkill(P(), plan.focus) ? ' and your focus' : '') + '.',
+    body: function () {
+      return opts.length ? h('div', { class: 'list' }, opts.map(function (c) {
+        return h('button', { class: 'item', onclick: function () { MX.applySwap(plan, b.id, c); closeSheet(); commit(); toast('Swapped'); } },
+          c.kind === 'gym' ? skillIcon('str') : skillIcon(c.q.skill),
+          h('div', { class: 'grow' }, h('div', { class: 'title small' }, candName(c)), h('div', { class: 'xs muted' }, candKind(c) + ' · ' + candMeta(c).slice(0, 2).join(' · '))), icon('chev', 16));
+      })) : h('p', { class: 'muted' }, 'Nothing else fits this slot within today\'s limits. You can remove the block instead.');
+    } });
+}
+function weekBuilderSheet(days) {
+  const s0 = st(), cfg = { focus: s0.prefs.focus || { mode: 'balanced' }, partner: P().partner === 'often' };
+  const existing = days.filter(function (k) { return (s0.plans || {})[k]; }).length;
+  openSheet({ eyebrow: 'Schedule', title: 'Build my week', sub: fmtDate(days[0]) + ' – ' + fmtDate(days[days.length - 1]) + ' · ' + plural(days.length, 'day'),
+    body: function (api) {
+      return [
+        h('p', { class: 'small' }, 'Plans every day around your practices, games, court and weight-room windows, and recent load. Includes at least one full rest day when the week allows, up to two strength or explosiveness days that are never the day before a game, and missions for practice and game days.'),
+        h('div', { class: 'eyebrow' }, 'Focus for the week'),
+        focusPicker(cfg.focus, function (f) { cfg.focus = f; api.refresh(); }),
+        toggleRow('Partner available most days', 'Off plans solo work. You can swap in partner drills on days you have one.', cfg.partner, function (v) { cfg.partner = v; api.refresh(); }),
+        existing ? h('div', { class: 'note' }, 'Replaces the plans on ' + plural(existing, 'day') + '. Days where you already completed planned work are kept.') : null,
+        h('p', { class: 'xs muted' }, 'Everything stays editable: change a day\'s focus or length, swap or remove blocks, or turn a day into rest.')
+      ];
+    },
+    foot: function () { return h('button', { class: 'btn primary block', id: 'week-go', onclick: function () {
+      const res = MX.buildWeek(s0, { todayKey: today(), nowMin: nowMin(), start: days[0], end: days[days.length - 1], focus: cfg.focus, partner: cfg.partner });
+      s0.plans = Object.assign({}, s0.plans || {}, res.plans); s0.prefs.focus = cfg.focus; MX.prunePlans(s0, today());
+      A.weekNotes = res.notes; A.schedDay = days[0];
+      closeSheet(); commit(); toast('Week planned: ' + plural(Object.keys(res.plans).length, 'day'));
+    } }, 'Build ' + plural(days.length, 'day')); }
   });
 }
