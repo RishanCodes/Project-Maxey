@@ -277,7 +277,7 @@ details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8p
       });
     });
     nodes.forEach(function (n) { n.req = n.req.map(function (r) { return r.indexOf('.') > 0 ? r : key + '.' + r; }); });
-    const b = Object.assign({ tree: key, branch: 'Boss', row: 4, col: 1, boss: true, goal: 'benchmark', x: [] }, boss,
+    const b = Object.assign({ tree: key, branch: 'Boss', row: branches.length, col: 1, boss: true, goal: 'benchmark', x: [] }, boss,
       { id: key + '.boss' });
     b.req = b.req.map(function (r) { return key + '.' + r; });
     nodes.push(b);
@@ -296,6 +296,11 @@ details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8p
         { id: 'b2', name: 'Inside-hand finishes', short: 'Inside hand', req: ['a2', 'a3'], goal: 'benchmark', purpose: 'Use the hand closest to the defender with control to finish around their body.' },
         { id: 'b3', name: 'Reverse finishes', short: 'Reverses', req: ['a3'], goal: 'benchmark', purpose: 'Use the rim as protection when a shot blocker is coming from the front side.' }
       ] },
+      { name: 'Contact finishing', blurb: 'Stay balanced, protect the ball and finish through legal, controlled contact.', nodes: [
+        { id: 'e1', name: 'Balance and body control', short: 'Body control', req: ['a3'], goal: 'benchmark', x: ['str.a3', 'str.b1'], purpose: 'Gather on a wide, braced base and keep your balance and the ball when you are knocked slightly off your line.' },
+        { id: 'e2', name: 'Finishing through controlled contact', short: 'Through contact', req: ['e1'], goal: 'pressure', x: ['str.d2'], purpose: 'Absorb a controlled bump at the gather and still finish with the correct hand, instead of fading away or avoiding the rim.' },
+        { id: 'e3', name: 'Contact finishing in live play', short: 'Live contact', req: ['e2'], goal: 'game', purpose: 'Finish through real, legal contact in practices and games, and earn and-ones and free throws.' }
+      ] },
       { name: 'Applied finishing', blurb: 'Finishing at speed, from angles, against bodies.', nodes: [
         { id: 'c1', name: 'Finishing from different angles', short: 'Angles', req: ['a1', 'a2'], goal: 'pressure', purpose: 'Finish from the slot, wing, corner and baseline at game speed, not just straight-on.' },
         { id: 'c2', name: 'Finishing against recovering defenders', short: 'Vs recovery', req: ['b1', 'b2', 'a3'], goal: 'pressure', x: ['sep.b2'], purpose: 'Protect the ball and pick the right hand when the defender you beat is chasing your hip.' },
@@ -306,7 +311,7 @@ details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8p
         { id: 'd2', name: 'Selecting finishes in live play', short: 'Finish menu', req: ['c1', 'c3'], goal: 'game', purpose: 'Use your full finishing menu in live play instead of forcing one move.' },
         { id: 'd3', name: 'Consistent application against defenders', short: 'Consistency', req: ['c1', 'c2'], goal: 'game', purpose: 'Finish at a steady rate against real defenders across many games.' }
       ] }
-    ], { name: 'Boss: The Finishing Gauntlet', short: 'Gauntlet', req: ['c1', 'c2', 'c3'], need: 2, purpose: 'A standardized finishing test across angles, hands and finish types. Clearing it shows your finishing holds up when the menu is mixed.' })
+    ], { name: 'Boss: The Finishing Gauntlet', short: 'Gauntlet', req: ['c1', 'c2', 'c3', 'e2'], need: 2, purpose: 'A standardized finishing test across angles, hands and finish types. Clearing it shows your finishing holds up when the menu is mixed.' })
   ];
 
   MX.TREES.push(
@@ -459,14 +464,14 @@ details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8p
         { id: 'b2', name: 'Upper-body push and pull balance', short: 'Push / pull', req: ['a3'], goal: 'benchmark', purpose: 'Build balanced upper-body strength for contact and ball protection.' },
         { id: 'b3', name: 'Loaded lower-body strength', short: 'Loaded legs', req: ['a1', 'a2'], need: 2, goal: 'benchmark', purpose: 'Add gradual load to squat and hinge patterns once technique is consistent.' }
       ] },
-      { name: 'Explosiveness', blurb: 'Land, stop and start well.', nodes: [
-        { id: 'c1', name: 'Landing and deceleration', short: 'Land & stop', req: ['a1', 'b1'], goal: 'benchmark', purpose: 'Absorb force quietly and under control. The base for safe jumping and cutting.' },
-        { id: 'c2', name: 'Acceleration mechanics', short: 'Accelerate', req: ['a3', 'b1'], goal: 'benchmark', x: ['sep.a1'], purpose: 'Use body lean and powerful pushes to start fast.' },
-        { id: 'c3', name: 'Change-of-direction mechanics', short: 'Cut', req: ['c1'], goal: 'benchmark', x: ['sep.c2'], purpose: 'Plant, stop, and redirect with control.' }
+      { name: 'Explosiveness', blurb: 'Accelerate, jump and land, stop and change direction with control.', nodes: [
+        { id: 'c1', name: 'Jumping and landing mechanics', short: 'Jump & land', req: ['a1', 'b1'], goal: 'benchmark', x: ['fin.e1'], purpose: 'Take off with a good hip hinge and arm swing, and land quietly with knees tracking over toes. The base for safe jumping, rebounding and finishing.' },
+        { id: 'c2', name: 'Acceleration mechanics', short: 'Accelerate', req: ['a3', 'b1'], goal: 'benchmark', x: ['sep.a1'], purpose: 'Use forward lean and powerful pushes to start fast from a basketball stance. Your first step, trained as a skill.' },
+        { id: 'c3', name: 'Deceleration and change of direction', short: 'Stop & cut', req: ['c1'], goal: 'benchmark', x: ['sep.c2', 'def.a3'], purpose: 'Stop in a few controlled steps with hips low, then plant and redirect. This is how quick guards create and keep separation without wrecking their knees.' }
       ] },
       { name: 'Applied athleticism', blurb: 'Power and strength in a basketball context.', nodes: [
-        { id: 'd1', name: 'Low-volume power', short: 'Power', req: ['c1'], goal: 'benchmark', purpose: 'Small doses of jumps and throws done with full intent and perfect landings.' },
-        { id: 'd2', name: 'Strength through contact', short: 'Contact', req: ['b2', 'b3'], goal: 'pressure', x: ['fin.c2'], purpose: 'Stay balanced and finish through a bump.' },
+        { id: 'd1', name: 'Low-volume power', short: 'Power', req: ['c1'], goal: 'benchmark', purpose: 'Small doses of jumps, approach jumps and throws done with full intent and perfect landings. Quality over volume.' },
+        { id: 'd2', name: 'Strength through contact', short: 'Contact', req: ['b2', 'b3'], goal: 'pressure', x: ['fin.c2', 'fin.e2'], purpose: 'Stay balanced and finish through a bump.' },
         { id: 'd3', name: 'Game-speed movement', short: 'Game speed', req: ['c2', 'c3'], goal: 'game', purpose: 'You feel your movement quality in games. Self-reported, not a measured speed gain.' }
       ] }
     ], { name: 'Boss: Movement Quality Screen', short: 'Screen', req: ['b1', 'c1', 'c3'], need: 2, purpose: 'A technique screen: controlled single-leg work and stuck landings on both sides. It checks quality, not maximal strength.' })
@@ -587,13 +592,47 @@ details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8p
     prog: 'Make the cue later (at the elbow).', regr: 'Know the cue before you start the rep.',
     recovery: 'Low to moderate load.' });
 
-  q({ id: 'fin-contact', name: 'Contact Finishing with Pad', skill: 'fin', nodes: ['fin.c2', 'str.d2'], skills: { fin: 0.7, str: 0.3 }, stage: 2, diff: 3, dur: 12, partner: 1, alt: 'fin-race',
+  /* ---- Contact finishing branch. Safety rules for every contact quest: contact only on the floor at the gather,
+     only through a pad or the defender's chest/vertical body, partner controls the intensity, never in the air, no shoving. ---- */
+  q({ id: 'fin-ct-balance', equipText: 'Ball and hoop.', name: 'Body-Control Gathers', skill: 'fin', nodes: ['fin.e1', 'fin.a3'], diff: 1, dur: 12, space: 'hoop',
+    measure: M('Balanced makes', 'Attempts', 20), bench: 0.7, load: 1, legs: 'light',
+    steps: ['Drive from the wing at 70–80% speed.', 'On every other rep, hop one step sideways off your line two dribbles before the gather, as if bumped. Recover your line.', 'Gather into a wide, braced two-foot jump stop: chest up, ball chinned, hold for one count.', 'Power up off two feet and finish. Counts only if you held the stop balanced and made it.'],
+    purpose: 'Builds the base, bracing and balance that contact finishing depends on, with no contact at all.',
+    transfer: 'Most lane contact knocks you slightly off line. Guards who stay balanced and braced finish through it; guards who are off balance fade or get blocked.',
+    prog: 'Shorten the hold, then gather off one foot after the side hop.', regr: 'Walk-speed gathers with a two-second hold.',
+    recovery: 'Low load. Fine on most days.' });
+
+  q({ id: 'fin-ct-protect', equipText: 'Ball and hoop. Pool noodle for the partner progression.', name: 'Ball-Security Finishes', skill: 'fin', nodes: ['fin.e1', 'bh.a3'], skills: { fin: 0.7, bh: 0.3 }, diff: 2, dur: 12, space: 'hoop',
+    measure: M('Protected makes', 'Attempts', 20), bench: 0.7, load: 1,
+    steps: ['Attack and rip the ball low-to-high across your body as you gather, away from an imagined reach.', 'Keep the ball tight to your chin or outside shoulder; keep your off-arm bent and close to your body (shield, never push off).', 'Finish with the hand away from the imagined defender. Alternate sides.', 'Counts only if the ball stayed protected the whole gather and you made it.'],
+    purpose: 'Teaches protecting the ball through the gather, where most strips and blocks happen.',
+    transfer: 'Defenders swipe down on the gather. A protected ball plus the far-hand finish turns contact into a foul call instead of a turnover.',
+    prog: 'Partner swipes at the ball (never the arms or body) with a pool noodle.', regr: 'Stationary rip-and-chin, then one dribble.',
+    recovery: 'Low load.' });
+
+  q({ id: 'fin-ct-cue', equipText: 'Ball, hoop, and a coin or random-number app.', name: 'Contact-Ready Finishes (Solo Cue)', skill: 'fin', nodes: ['fin.e2', 'fin.c2'], stage: 2, diff: 2, dur: 15, space: 'hoop',
+    measure: M('Correct makes', 'Attempts', 20), bench: 0.6, load: 2, legs: 'light',
+    steps: ['Use a random cue as you reach the 3-point line (coin or random-number app): contact left, contact right, or no contact.', 'Contact: two-foot gather, shoulders and hips braced toward the cue side, ball moved to the far side, finish with the far hand off the glass.', 'No contact: quick one-foot finish at full speed.', 'Counts only if your response matched the cue and you made it.'],
+    purpose: 'Solo route to applied contact finishing: a decision plus a braced, protected finish at game speed.',
+    transfer: 'In games you must read whether contact is coming and choose a braced finish or a quick one. This trains that choice without a partner.',
+    prog: 'Make the cue later (at the elbow), or use Controlled Pad Finishing with a partner.', regr: 'Know the cue before the rep starts.',
+    recovery: 'Moderate load.' });
+
+  q({ id: 'fin-contact', equipText: 'Ball, hoop, a partner and a pad or firm cushion.', name: 'Controlled Pad Finishing', skill: 'fin', nodes: ['fin.e2', 'fin.c2', 'str.d2'], skills: { fin: 0.7, str: 0.3 }, stage: 2, diff: 3, dur: 12, partner: 1, alt: 'fin-ct-cue',
     measure: M('Makes', 'Attempts', 16), bench: 0.55, load: 2,
-    steps: ['Partner holds a pad (or a firm cushion) and gives a light, controlled bump on your gather.', 'Absorb, stay balanced, and finish with the outside hand.', 'Partner adjusts contact to stay safe. Never hit in the air.'],
-    purpose: 'Teaches staying on balance through contact.',
-    transfer: 'Lane contact is constant. Finishing through it turns contact into and-ones.',
-    prog: 'Bump on the second step instead of the gather.', regr: 'Very light contact with a walk-through.',
+    steps: ['Partner stands still beside the lane holding a pad (or firm cushion) at chest height. They set the contact level and can stop any rep.', 'On your gather, while both your feet are on the floor, they lean the pad into your shoulder with light, steady pressure. No shoving, no swinging, never contact in the air.', 'Absorb with a wide base, keep the ball protected, and finish with the outside hand.', 'Start at walking pace and build to 70% speed only when every rep is controlled.'],
+    purpose: 'Applied finishing through controlled, predictable contact.',
+    transfer: 'Lane contact is constant. Finishing through it turns contact into and-ones instead of blocked shots.',
+    prog: 'Contact on the second step instead of the gather, still on the floor.', regr: 'Very light contact with a walk-through.',
     recovery: 'Moderate. Skip when sore or the day before a game.' });
+
+  q({ id: 'fin-ct-live', equipText: 'Ball, hoop, a defender and a pad.', name: 'Controlled Contact 1v1', skill: 'fin', nodes: ['fin.e2', 'str.d2'], skills: { fin: 0.7, str: 0.3 }, stage: 2, diff: 3, dur: 15, partner: 2, alt: 'fin-ct-cue',
+    measure: M('Finishes through contact', 'Possessions', 10), bench: 0.5, load: 2, legs: 'light',
+    steps: ['Defender starts in the lane holding a pad, feet set. You attack from the wing at 60–70% speed.', 'Defender may only stay vertical and meet you with the pad at the gather. No reaching for the body, no shoving, no contact once you leave the floor.', 'Finish through the pad contact. Count made finishes where you stayed balanced.', 'Either player can call "stop" at any time.'],
+    purpose: 'Live decisions against a defender who provides legal, controlled contact.',
+    transfer: 'The closest safe version of real paint contact: a defender walling up, which is exactly how refs expect defenders to play you.',
+    prog: 'Defender may step to cut off your line (still pad-only, feet on the floor).', regr: 'Defender stays fully stationary.',
+    recovery: 'Moderate. Not the day before a game.' });
 
   /* ---------------- SHOOTING ---------------- */
   q({ id: 'sht-form', name: 'Form Shooting Ladder', skill: 'sht', nodes: ['sht.a1'], diff: 1, dur: 10, space: 'hoop',
@@ -878,6 +917,45 @@ details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8p
     purpose: 'Learn to bring your system down.', transfer: 'Dead-ball recovery and good sleep both help late-game performance.',
     prog: 'Use it between shooting sets.', regr: '2 minutes.', recovery: 'Recovery activity.' });
 
+  /* ---------------- ATHLETIC DEVELOPMENT: EXPLOSIVENESS ----------------
+     Quality-scored, low-volume, full rest between reps. Scheduled only on fresh days without practice or a game in the next 24 h. */
+  function ath(o) { q(Object.assign({ type: 'athletic', skill: 'str', space: 'field', diff: 1, dur: 15, load: 1, legs: 'light' }, o)); }
+  ath({ id: 'ath-land', equipText: 'A low, stable step or box (about 30 cm / 12 in) and a non-slip floor. No ball needed.', name: 'Jump-Landing Mechanics (Baseline)', nodes: ['str.c1', 'str.d1'], space: 'home', baseline: true, unlocks: { nodes: ['str.c1'], at: 0.9 },
+    measure: M('Stuck landings', 'Landings', 15), bench: 0.8,
+    steps: ['Warm up 5 minutes (easy jog, skips, leg swings).', '5 snap-downs: rise to your toes, snap into an athletic stance, land quietly and hold 2 seconds.', '5 step-off landings from a low, stable step (about 30 cm / 12 in): land on both feet and hold 2 seconds.', '5 jump-and-stick: small vertical jump with an arm swing, land and hold 2 seconds.', 'A landing counts as stuck if it was quiet, knees tracked over toes (no caving in) and you held still for 2 seconds. Rest 20–30 s between reps.'],
+    purpose: 'Standardized landing check and the technique base for every jump, rebound and finish.',
+    transfer: 'Controlled landings let you finish, rebound and cut repeatedly. Quiet landings mean the muscles absorb force instead of the joints.',
+    prog: 'Single-leg landings from the low step, or lateral hop-and-stick.', regr: 'Snap-downs only, slower.',
+    recovery: 'Low load. Use the same rules each time so results compare.' });
+  ath({ id: 'ath-accel', equipText: 'About 15 m of open, non-slip space and two markers.', name: 'Acceleration Starts from Stance', nodes: ['str.c2', 'sep.a1'], skills: { str: 0.7, sep: 0.3 }, load: 2,
+    measure: M('Clean starts', 'Starts', 8), bench: 0.75,
+    steps: ['Mark 10 m (about the free-throw line to half court and a bit).', 'Start from a basketball stance: 2 from triple threat, 2 from a defensive stance, 2 from a jab step, 2 after a crossover.', 'Push the ground back and keep a forward lean for the first 3–4 steps; do not pop upright.', 'Walk back slowly. Rest at least 45–60 s. A start is clean if your first two steps were low and powerful with no stutter.'],
+    purpose: 'Trains acceleration posture from the positions you actually start from in games.',
+    transfer: 'Your first step is a strength. Acceleration mechanics keep it sharp and extend it into steps 2–4, which is where advantages are kept.',
+    prog: 'Start on a partner\'s clap or a random timer (reaction), or with a ball.', regr: 'Wall-drive marches, then falling starts.',
+    recovery: 'Moderate on legs. Quality drops when tired: stop when starts get sloppy.' });
+  ath({ id: 'ath-decel', equipText: 'About 10 m of open, non-slip space and a marker.', name: 'Deceleration Ladder', nodes: ['str.c3', 'str.c1'], load: 1,
+    measure: M('Controlled stops', 'Stops', 12), bench: 0.75,
+    steps: ['Jog 5 m and stop in 3 steps, hips low, chest over knees. Hold the stop. 4 reps.', 'Run 5 m at 75% and stop in 3 steps. 4 reps.', 'Run 5 m at 75% and stop in 2 steps, finishing in a balanced stance. 4 reps.', 'A stop counts if knees stayed over toes (no caving), you did not slide or stumble, and you could have moved again immediately. Walk back to recover.'],
+    purpose: 'Teaches stopping under control, the most important part of change of direction.',
+    transfer: 'Hard stops create pull-up space and let you change direction without losing balance or loading your knees badly.',
+    prog: 'Stop into a pull-up stance with a ball, or into a defensive slide.', regr: 'Jog speed only, 3-step stops.',
+    recovery: 'Low to moderate load.' });
+  ath({ id: 'ath-cod', equipText: 'Two cones, open non-slip space, and a random-number app or a partner.', name: 'Reactive Change of Direction (Solo Cue)', nodes: ['str.c3', 'str.c2', 'sep.c2'], skills: { str: 0.7, sep: 0.3 }, stage: 2, diff: 2, load: 2, legs: 'moderate',
+    measure: M('Clean cuts', 'Reps', 12), bench: 0.7,
+    steps: ['Place two cones 3 m to your left and right. Start in a basketball stance in the middle.', 'Use a random cue (random-number app or a partner pointing): even = left, odd = right.', 'Push off, decelerate in 2–3 steps at the cone, plant and sprint back through the middle.', 'Rest 45 s. A cut counts if you reacted the right way, stopped balanced with knees tracking, and re-accelerated without a stumble.'],
+    purpose: 'Applies deceleration and acceleration together with a decision.',
+    transfer: 'Games are reactive. You cut because the defense moved, not on a plan. This links clean mechanics to reading a cue.',
+    prog: 'Add a ball, or a third cue (forward sprint).', regr: 'Known direction, half speed.',
+    recovery: 'Moderate on legs. Not within 24 hours of a game.' });
+  ath({ id: 'ath-jump', equipText: 'A hoop or backboard to reach toward, and a non-slip floor.', name: 'Approach Jump Series', nodes: ['str.d1', 'str.c1'], skills: { str: 0.8, fin: 0.2 }, diff: 2, load: 2, legs: 'moderate', space: 'court',
+    measure: M('Quality jumps', 'Jumps', 9), bench: 0.78,
+    steps: ['After a full warm-up, take 2–3 steps and jump off two feet (3 jumps), off your right foot (3) and off your left foot (3), reaching for the rim or backboard.', 'Full intent on every jump, then land and stick it.', 'Rest 60–90 s between jumps. This is about quality, not conditioning.', 'A jump counts if it was full intent AND the landing was quiet and balanced. Note your highest touch in the notes if you like.'],
+    purpose: 'Low-volume jumping power built on the landing technique you already own.',
+    transfer: 'Approach jumps mirror layups, rebounds and contests. Few, high-quality reps develop power without the fatigue of high-volume jumping.',
+    prog: 'Add one more jump per side, or a dribble into the approach.', regr: 'Two-foot jumps only, or Jump-Landing Mechanics.',
+    recovery: 'Moderate on legs. Never on top of practice, and not within 24 hours of a game.' });
+
   /* ---------------- RECOVERY ---------------- */
   q({ id: 'rec-mobility', name: 'Mobility Flow', skill: 'str', type: 'recovery', nodes: ['cond.c3', 'str.a1'], skills: { cond: 0.5, str: 0.5 }, diff: 1, dur: 12, space: 'home',
     measure: DONE, load: 0,
@@ -900,6 +978,9 @@ details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8p
   mission({ id: 'tm-keep', name: 'Practice Mission: Keep the Advantage', skill: 'sep', nodes: ['sep.d1', 'sep.d3'], reportSkills: ['sep', 'fin'],
     steps: ['In team practice today, every time you beat your man: stay on the line past his hip.', 'Afterwards, note roughly how often you kept the advantage.'],
     purpose: 'Bring your main focus into team practice.', transfer: 'Practice reps against teammates are the bridge to games.', prog: '—', regr: '—', recovery: 'Uses practice time. No extra load.' });
+  mission({ id: 'tm-contact', name: 'Practice Mission: Finish Through Contact', skill: 'fin', nodes: ['fin.e3', 'fin.d3'], reportSkills: ['fin', 'str'],
+    steps: ['In team practice, when a defender walls up on your drive: wide gather, ball protected, finish with the far hand. Do not avoid the rim.', 'Never initiate dangerous contact. Play within the rules and your coach\'s instructions.', 'Afterwards, note how often you finished or drew the foul when contact came.'],
+    purpose: 'Bring contact finishing into practice against real defenders.', transfer: 'Live practice is the bridge between pad work and games.', prog: '—', regr: '—', recovery: 'Uses practice time. No extra load.' });
   mission({ id: 'tm-shot', name: 'Practice Mission: Shot Selection Check', skill: 'sht', nodes: ['sht.d1', 'sht.d2'], reportSkills: ['sht', 'iq'],
     steps: ['In scrimmage today, before each shot ask: is this a shot I make in training?', 'Note how many shots were good shots.'],
     purpose: 'Connect drill work to shot choices.', transfer: 'Good shot selection makes your percentage reflect your real skill.', prog: '—', regr: '—', recovery: 'No extra load.' });
@@ -909,7 +990,7 @@ details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8p
   mission({ id: 'tm-pressure', name: 'Practice Mission: Calm Against Pressure', skill: 'bh', nodes: ['bh.d1', 'bh.d3'], reportSkills: ['bh', 'iq'],
     steps: ['When pressured in practice: protect, keep your eyes up, use a retreat dribble if needed.', 'Note turnovers and good escapes.'],
     purpose: 'Take ball protection into practice.', transfer: 'Pressure handling must hold up against real defenders.', prog: '—', regr: '—', recovery: 'No extra load.' });
-  mission({ id: 'gm-attack', name: 'Game Mission: Attack and Decide', type: 'game', skill: 'sep', nodes: ['sep.d1', 'sep.d2', 'fin.d1'], reportSkills: ['sep', 'fin', 'sht'],
+  mission({ id: 'gm-attack', name: 'Game Mission: Attack and Decide', type: 'game', skill: 'sep', nodes: ['sep.d1', 'sep.d2', 'fin.d1', 'fin.e3'], reportSkills: ['sep', 'fin', 'sht'],
     steps: ['Attack downhill when you have the first step. After separation, make the next decision fast: finish, pull up, or kick.', 'After the game, report what worked and what did not. Be honest. Mixed is normal.'],
     purpose: 'Apply your primary focus in a real game.', transfer: 'This is the stage that counts.', prog: '—', regr: '—', recovery: 'Game day: no hard training before the game.' });
   mission({ id: 'gm-shots', name: 'Game Mission: Quality Looks Only', type: 'game', skill: 'sht', nodes: ['sht.d1', 'sht.d3', 'sht.d2'], reportSkills: ['sht', 'iq'],
@@ -1073,7 +1154,7 @@ details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8p
     { id: 'w-upper', name: 'Upper Body & Core (Game-Week Safe)', dur: 30, legs: 'none', load: 1, where: 'gym',
       purpose: 'Strength work that leaves your legs fresh for games and practices.',
       items: [['dbbench', 3, '8–10'], ['invrow', 3, '8–10'], ['kneelpress', 2, '8 / side'], ['dbrow', 2, '10 / side'], ['pallof', 2, '10 / side'], ['deadbug', 2, '8 / side']] },
-    { id: 'w-move', name: 'Landing & Movement Mechanics', dur: 25, legs: 'light', load: 1, where: 'any',
+    { id: 'w-move', name: 'Landing & Movement Mechanics', dur: 25, legs: 'light', load: 1, where: 'any', explosive: true,
       purpose: 'Low-volume jumping, landing, acceleration and deceleration technique.',
       items: [['pogo', 2, '10'], ['snapdown', 3, '3–5'], ['latbound', 3, '3 / side'], ['decel', 3, '3'], ['fallstart', 4, '1 x 10 m'], ['calf', 2, '12 / side']] },
     { id: 'w-home', name: 'At-Home Bodyweight Strength', dur: 25, legs: 'light', load: 1, where: 'home',
@@ -1262,7 +1343,8 @@ details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8p
   MX.lastLegStrength = function (state, todayKey) {
     let best = null;
     state.logs.forEach(function (l) {
-      if ((l.kind === 'gym' || l.kind === 'custom') && legsRank(logLegs(l)) >= 2 && l.date <= todayKey) { if (!best || l.date > best) best = l.date; }
+      const athletic = l.kind === 'quest' && MX.QUEST[l.qid] && MX.QUEST[l.qid].type === 'athletic';
+      if ((l.kind === 'gym' || l.kind === 'custom' || athletic) && legsRank(logLegs(l)) >= 2 && l.date <= todayKey) { if (!best || l.date > best) best = l.date; }
     });
     for (let i = 0; i < 4; i++) {
       const k = addDays(todayKey, -i);
@@ -1520,7 +1602,7 @@ details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8p
       if (r >= rank('game')) { tierCounts.game++; award(o.ev && o.ev.last || todayKey, 'Game-applied: ' + n.name, 60, false); }
     });
     MX.TREES.forEach(function (t) {
-      for (let row = 0; row < 4; row++) {
+      for (let row = 0; row < t.branches.length - 1; row++) {
         const ns = t.nodes.filter(function (n) { return n.row === row; });
         if (ns.length && ns.every(function (n) { return tree.nodes[n.id].mastered; })) fullBranches++;
       }
@@ -1693,6 +1775,8 @@ details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8p
     else if (recent >= 6) { maxLoad = Math.min(maxLoad, 2); notes.push('Solid workload recently, so the most demanding options are filtered out.'); }
     const lastLegs = MX.lastLegStrength(state, key);
     const legsStrengthRecent = lastLegs && daysBetween(lastLegs, key) < 2;
+    // Explosive work needs freshness: never on top of a practice or game day, the day before a game, a heavy stretch, or when tired/sore.
+    const explosiveBlock = !!(practiceToday || gameToday || gameTomorrow || recent >= 6 || (ready && (ready.level !== 'fresh' || ready.sore === 'high' || ready.pain)));
 
     // --- location
     let loc = ctx.loc || 'auto';
@@ -1752,7 +1836,9 @@ details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8p
       if (q.load > maxLoad) return;
       if (legsRank(q.legs) > maxLegs) return;
       if (q.type === 'boss') { const bn = tree.nodes[q.nodes[0]]; if (!bn.unlocked || bn.mastered) return; }
-      if (q.nodes.length && !q.nodes.some(function (n) { return tree.nodes[n] && tree.nodes[n].unlocked; })) return; // advanced content waits for readiness
+      if (q.nodes.length && !q.baseline && !q.nodes.some(function (n) { return tree.nodes[n] && tree.nodes[n].unlocked; })) return; // advanced content waits for readiness (baselines are the test-in route)
+      if (q.type === 'athletic' && explosiveBlock) return;
+      if (q.type === 'athletic' && legsRank(q.legs) >= 2 && legsStrengthRecent) return;
       if (q.type === 'cond' && (recent >= 6 || practiceLater)) return; // no extra conditioning on top of heavy practice load
       let s = 0;
       Object.keys(q.skills).forEach(function (k) { s += Math.max(-0.1, deficit[k]) * 100 * q.skills[k]; });
@@ -1770,6 +1856,7 @@ details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8p
         else if (!due) s -= 15;
       }
       if (q.type === 'boss') { s += 6; why.push('Boss challenge unlocked. A milestone test of this tree.'); }
+      if (q.type === 'athletic') why.push('No practice or game close by and you are fresh, so explosive work can be done at full quality.');
       if (q.type === 'recovery') s += maxLoad <= 1 ? 30 : -20;
       s += Math.max(0, 5 - Math.abs(minutes - q.dur) / 5);
       if (q.stage === 2) s += 2;
@@ -1786,6 +1873,7 @@ details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8p
       if (legsRank(w.legs) > maxLegs) return;
       if (legsRank(w.legs) >= 2 && legsStrengthRecent) return;
       if (legsRank(w.legs) >= 2 && practiceLater) return;
+      if (w.explosive && explosiveBlock) return;
       const r = MX.resolveWorkout(state, w); if (!r.ok) return;
       let s = Math.max(-0.1, deficit.str) * 100;
       const why = baseReasons({ str: 1 });
@@ -2363,7 +2451,7 @@ function evColor(t) { return { school: '#4A5568', practice: '#2C7BFF', game: '#3
 const SPACE_LABEL = { court: 'Court', hoop: 'Any hoop', home: 'At home', field: 'Open space', any: 'Anywhere' };
 const PARTNER_LABEL = ['Solo', 'Needs a helper', 'Needs a live defender'];
 const STAGE_LABEL = { 1: 'Technique', 2: 'Applied', 3: 'Game' };
-const KIND_LABEL = { skill: 'Skill quest', boss: 'Boss challenge', team: 'Practice mission', game: 'Game mission', film: 'Film study', recovery: 'Recovery', cond: 'Conditioning' };
+const KIND_LABEL = { skill: 'Skill quest', boss: 'Boss challenge', team: 'Practice mission', game: 'Game mission', film: 'Film study', recovery: 'Recovery', cond: 'Conditioning', athletic: 'Explosiveness' };
 
 function viewHome() {
   const k = today(), s0 = st(), prog = MX.progress(s0, k), ctx = todayCtx();
@@ -2535,7 +2623,7 @@ function nodeChip(id, tree) {
 }
 function questDetail(q, why) {
   const tree = MX.computeTree(st()).nodes;
-  const locked = q.nodes.length && !q.nodes.some(function (n) { return tree[n].unlocked; });
+  const locked = q.nodes.length && !q.baseline && !q.nodes.some(function (n) { return tree[n].unlocked; });
   openSheet({
     eyebrow: (KIND_LABEL[q.type] || 'Skill quest') + ' · ' + MX.SKILLS[q.skill].name, title: q.name,
     sub: [q.dur ? q.dur + ' min' : null, 'Difficulty ' + q.diff + '/3', STAGE_LABEL[q.stage], SPACE_LABEL[q.space], PARTNER_LABEL[q.partner]].filter(Boolean).join(' · '),
@@ -2553,7 +2641,7 @@ function questDetail(q, why) {
           h('dt', null, 'Progression'), h('dd', null, q.prog),
           h('dt', null, 'Regression'), h('dd', null, q.regr),
           h('dt', null, 'Recovery'), h('dd', null, q.recovery),
-          h('dt', null, 'Equipment'), h('dd', null, q.space === 'home' ? 'Ball (and a wall for passing drills)' : q.space === 'field' ? 'Open space, cones optional' : q.space === 'any' ? 'Your practice or game' : 'Ball and hoop. Cones or a chair help.')),
+          h('dt', null, 'Equipment'), h('dd', null, q.equipText ? q.equipText : q.space === 'home' ? 'Ball (and a wall for passing drills)' : q.space === 'field' ? 'Open space, cones optional' : q.space === 'any' ? 'Your practice or game' : 'Ball and hoop. Cones or a chair help.')),
         q.alt ? h('p', { class: 'small' }, 'No partner today? Solo alternative: ', h('button', { class: 'link', onclick: function () { closeSheet(); questDetail(MX.QUEST[q.alt]); } }, MX.QUEST[q.alt].name)) : null,
         q.nodes.length ? h('div', { class: 'stack' }, h('div', { class: 'eyebrow' }, 'Skill-tree nodes this builds'), h('div', { class: 'chips' }, q.nodes.map(function (n) { return nodeChip(n, { nodes: tree }); }))) : null
       ];
@@ -2824,7 +2912,7 @@ function trainQuests() {
     if (f.space === 'court' && q.space === 'any') return false;
     if (f.partner !== 'all' && String(q.partner) !== f.partner) return false;
     if (f.diff && q.diff !== f.diff) return false;
-    const locked = q.nodes.length && !q.nodes.some(function (n) { return tree[n].unlocked; });
+    const locked = q.nodes.length && !q.baseline && !q.nodes.some(function (n) { return tree[n].unlocked; });
     if (locked && !f.locked) return false;
     return true;
   }).sort(function (a, b) {
@@ -2841,7 +2929,7 @@ function trainQuests() {
       toggleRow('Show locked quests', 'Quests whose skill nodes are not unlocked yet.', f.locked, function (v) { upd('locked', v); })),
     h('div', { class: 'xs muted' }, plural(list.length, 'quest') + ' · your focus areas first'),
     h('div', { class: 'card', style: { padding: '2px 14px' } }, list.length ? h('div', { class: 'list' }, list.map(function (q) {
-      const locked = q.nodes.length && !q.nodes.some(function (n) { return tree[n].unlocked; });
+      const locked = q.nodes.length && !q.baseline && !q.nodes.some(function (n) { return tree[n].unlocked; });
       return h('button', { class: 'item', onclick: function () { questDetail(q); } }, skillIcon(q.skill),
         h('div', { class: 'grow' }, h('div', { class: 'title' }, q.name),
           h('div', { class: 'row', style: { gap: '4px', marginTop: '3px' } },
@@ -2870,6 +2958,18 @@ function trainGym() {
         icon('chev', 18));
     }))),
     h('button', { class: 'btn block', id: 'btn-custom', onclick: openCustomWorkout }, icon('plus', 18), 'Log a coach-assigned workout'),
+    h('div', { class: 'section-title' }, h('h2', null, 'Explosiveness drills')),
+    h('p', { class: 'xs muted' }, 'Acceleration, jumping and landing, deceleration and change of direction. Low volume, full rest, scored on quality. Recommended only on fresh days without practice or a game in the next 24 hours.'),
+    (function () {
+      const tree = MX.computeTree(st()).nodes;
+      return h('div', { class: 'card', style: { padding: '2px 14px' }, id: 'explosive-list' }, h('div', { class: 'list' }, MX.QUESTS.filter(function (q) { return q.type === 'athletic'; }).map(function (q) {
+        const locked = !q.baseline && !q.nodes.some(function (n) { return tree[n].unlocked; });
+        return h('button', { class: 'item', onclick: function () { questDetail(q); } }, skillIcon('str'),
+          h('div', { class: 'grow' }, h('div', { class: 'title' }, q.name),
+            h('div', { class: 'row', style: { gap: '4px', marginTop: '3px' } }, h('span', { class: 'tag' }, q.dur + ' min'), h('span', { class: 'tag ' + (q.stage === 2 ? 'cyan' : 'blue') }, STAGE_LABEL[q.stage]), h('span', { class: 'tag ' + (q.legs === 'moderate' ? 'warn' : 'good') }, 'Legs: ' + q.legs), q.baseline ? h('span', { class: 'tag good' }, 'Baseline') : null, locked ? h('span', { class: 'tag bad' }, 'Locked') : null)),
+          icon('chev', 18));
+      })));
+    })(),
     h('div', { class: 'section-title' }, h('h2', null, 'Exercise library'), h('span', { class: 'xs muted' }, MX.EXERCISES.length + ' exercises')),
     h('div', { class: 'card', style: { padding: '2px 14px' } }, h('div', { class: 'list' }, MX.EXERCISES.map(function (e) {
       return h('button', { class: 'item', onclick: function () { exerciseDetail(e.id); } }, h('div', { class: 'grow' }, h('div', { class: 'title' }, e.name), h('div', { class: 'xs muted' }, e.cat + ' · ' + (e.equip.length ? e.equip.map(function (q) { return MX.EQUIPMENT[q]; }).join(', ') : 'No equipment') + (e.sup ? ' · supervised' : ''))), icon('chev', 16));
@@ -2918,10 +3018,10 @@ function progTrees(prog) {
       [['#2E3B4F', 'Locked'], ['#2C7BFF', 'Unlocked / practicing'], ['#5E9BFF', 'Benchmark'], ['#3CD3FF', 'Under pressure'], ['#F3F6FB', 'Game-applied'], ['#C9D2DF', 'Ring = mastered']].map(function (x) { return h('span', { style: { '--c': x[0] } }, x[1]); })),
     h('p', { class: 'xs muted' }, 'Nodes unlock when a prerequisite reaches benchmark, or when you prove that node directly with a strong result. Tap a node for details, quests and mastery rules. Tiers come from logged evidence only.'));
 }
-function treeLayout() {
+function treeLayout(t) {
   const W = 360, cols = [62, 180, 298];
   const rowY = function (r) { return 64 + r * 132; };
-  return { W: W, H: rowY(4) + 92, x: function (n) { return n.boss ? 180 : cols[n.col]; }, y: function (n) { return rowY(n.row); }, rowY: rowY };
+  return { W: W, H: rowY(t.branches.length - 1) + 92, x: function (n) { return n.boss ? 180 : cols[n.col]; }, y: function (n) { return rowY(n.row); }, rowY: rowY };
 }
 function wrapLabel(t, max) {
   const words = t.split(' '), lines = []; let cur = '';
@@ -2930,14 +3030,14 @@ function wrapLabel(t, max) {
   return lines.slice(0, 2);
 }
 function treeMap(key, nodes) {
-  const t = MX.TREE[key], L = treeLayout(), p = P();
+  const t = MX.TREE[key], L = treeLayout(t), p = P();
   const isFocus = key === p.primary || key === p.secondary;
   const nextIds = t.nodes.filter(function (n) { return nodes[n.id].unlocked && !nodes[n.id].mastered; }).sort(function (a, b) { return a.row - b.row || MX.rank(nodes[b.id].tier) - MX.rank(nodes[a.id].tier); }).slice(0, 2).map(function (n) { return n.id; });
   const z = A.zoom;
   const svg = s('svg', { viewBox: '0 0 ' + L.W + ' ' + L.H, width: Math.round(L.W * z * (window.innerWidth > 560 ? 1.35 : 1)), role: 'group', 'aria-label': MX.SKILLS[key].name + ' skill tree', style: 'max-width:none' });
   // branch labels
   t.branches.forEach(function (b, r) {
-    const y = r < 4 ? L.rowY(r) - 44 : L.rowY(4) - 44;
+    const y = L.rowY(r) - 44;
     svg.appendChild(s('text', { x: 14, y: y, fill: '#8E9BB0', 'font-size': 11, 'font-family': 'Barlow Condensed, Arial Narrow, sans-serif', 'font-weight': 600, 'letter-spacing': '1.6', text: b.name.toUpperCase() }));
     svg.appendChild(s('line', { x1: 14 + b.name.length * 7.2 + 8, x2: L.W - 14, y1: y - 4, y2: y - 4, stroke: '#1B2432', 'stroke-width': 1 }));
   });
@@ -2950,7 +3050,7 @@ function treeMap(key, nodes) {
       let d;
       const top = y1 + 27, bot = y2 - (n.boss ? 31 : 27);
       if (r.row === n.row) d = 'M' + (x1 + 27) + ' ' + y1 + ' L' + (x2 - 27) + ' ' + y2;
-      else if (n.row - r.row === 1 || (n.boss && r.row === 3)) { const my = (top + bot) / 2; d = 'M' + x1 + ' ' + top + ' C' + x1 + ' ' + my + ' ' + x2 + ' ' + my + ' ' + x2 + ' ' + bot; }
+      else if (n.row - r.row === 1) { const my = (top + bot) / 2; d = 'M' + x1 + ' ' + top + ' C' + x1 + ' ' + my + ' ' + x2 + ' ' + my + ' ' + x2 + ' ' + bot; }
       else {
         // Skips a row: run down a gutter between columns so the line never crosses a node or its label.
         const ch = x1 === x2 ? (x1 < 180 ? 121 : 239) : (Math.abs(x1 - x2) > 150 ? (x1 < x2 ? 121 : 239) : (x1 + x2) / 2);

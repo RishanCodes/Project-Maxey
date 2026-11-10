@@ -18,7 +18,7 @@ function trainQuests() {
     if (f.space === 'court' && q.space === 'any') return false;
     if (f.partner !== 'all' && String(q.partner) !== f.partner) return false;
     if (f.diff && q.diff !== f.diff) return false;
-    const locked = q.nodes.length && !q.nodes.some(function (n) { return tree[n].unlocked; });
+    const locked = q.nodes.length && !q.baseline && !q.nodes.some(function (n) { return tree[n].unlocked; });
     if (locked && !f.locked) return false;
     return true;
   }).sort(function (a, b) {
@@ -35,7 +35,7 @@ function trainQuests() {
       toggleRow('Show locked quests', 'Quests whose skill nodes are not unlocked yet.', f.locked, function (v) { upd('locked', v); })),
     h('div', { class: 'xs muted' }, plural(list.length, 'quest') + ' · your focus areas first'),
     h('div', { class: 'card', style: { padding: '2px 14px' } }, list.length ? h('div', { class: 'list' }, list.map(function (q) {
-      const locked = q.nodes.length && !q.nodes.some(function (n) { return tree[n].unlocked; });
+      const locked = q.nodes.length && !q.baseline && !q.nodes.some(function (n) { return tree[n].unlocked; });
       return h('button', { class: 'item', onclick: function () { questDetail(q); } }, skillIcon(q.skill),
         h('div', { class: 'grow' }, h('div', { class: 'title' }, q.name),
           h('div', { class: 'row', style: { gap: '4px', marginTop: '3px' } },
@@ -64,6 +64,18 @@ function trainGym() {
         icon('chev', 18));
     }))),
     h('button', { class: 'btn block', id: 'btn-custom', onclick: openCustomWorkout }, icon('plus', 18), 'Log a coach-assigned workout'),
+    h('div', { class: 'section-title' }, h('h2', null, 'Explosiveness drills')),
+    h('p', { class: 'xs muted' }, 'Acceleration, jumping and landing, deceleration and change of direction. Low volume, full rest, scored on quality. Recommended only on fresh days without practice or a game in the next 24 hours.'),
+    (function () {
+      const tree = MX.computeTree(st()).nodes;
+      return h('div', { class: 'card', style: { padding: '2px 14px' }, id: 'explosive-list' }, h('div', { class: 'list' }, MX.QUESTS.filter(function (q) { return q.type === 'athletic'; }).map(function (q) {
+        const locked = !q.baseline && !q.nodes.some(function (n) { return tree[n].unlocked; });
+        return h('button', { class: 'item', onclick: function () { questDetail(q); } }, skillIcon('str'),
+          h('div', { class: 'grow' }, h('div', { class: 'title' }, q.name),
+            h('div', { class: 'row', style: { gap: '4px', marginTop: '3px' } }, h('span', { class: 'tag' }, q.dur + ' min'), h('span', { class: 'tag ' + (q.stage === 2 ? 'cyan' : 'blue') }, STAGE_LABEL[q.stage]), h('span', { class: 'tag ' + (q.legs === 'moderate' ? 'warn' : 'good') }, 'Legs: ' + q.legs), q.baseline ? h('span', { class: 'tag good' }, 'Baseline') : null, locked ? h('span', { class: 'tag bad' }, 'Locked') : null)),
+          icon('chev', 18));
+      })));
+    })(),
     h('div', { class: 'section-title' }, h('h2', null, 'Exercise library'), h('span', { class: 'xs muted' }, MX.EXERCISES.length + ' exercises')),
     h('div', { class: 'card', style: { padding: '2px 14px' } }, h('div', { class: 'list' }, MX.EXERCISES.map(function (e) {
       return h('button', { class: 'item', onclick: function () { exerciseDetail(e.id); } }, h('div', { class: 'grow' }, h('div', { class: 'title' }, e.name), h('div', { class: 'xs muted' }, e.cat + ' · ' + (e.equip.length ? e.equip.map(function (q) { return MX.EQUIPMENT[q]; }).join(', ') : 'No equipment') + (e.sup ? ' · supervised' : ''))), icon('chev', 16));
@@ -112,10 +124,10 @@ function progTrees(prog) {
       [['#2E3B4F', 'Locked'], ['#2C7BFF', 'Unlocked / practicing'], ['#5E9BFF', 'Benchmark'], ['#3CD3FF', 'Under pressure'], ['#F3F6FB', 'Game-applied'], ['#C9D2DF', 'Ring = mastered']].map(function (x) { return h('span', { style: { '--c': x[0] } }, x[1]); })),
     h('p', { class: 'xs muted' }, 'Nodes unlock when a prerequisite reaches benchmark, or when you prove that node directly with a strong result. Tap a node for details, quests and mastery rules. Tiers come from logged evidence only.'));
 }
-function treeLayout() {
+function treeLayout(t) {
   const W = 360, cols = [62, 180, 298];
   const rowY = function (r) { return 64 + r * 132; };
-  return { W: W, H: rowY(4) + 92, x: function (n) { return n.boss ? 180 : cols[n.col]; }, y: function (n) { return rowY(n.row); }, rowY: rowY };
+  return { W: W, H: rowY(t.branches.length - 1) + 92, x: function (n) { return n.boss ? 180 : cols[n.col]; }, y: function (n) { return rowY(n.row); }, rowY: rowY };
 }
 function wrapLabel(t, max) {
   const words = t.split(' '), lines = []; let cur = '';
@@ -124,14 +136,14 @@ function wrapLabel(t, max) {
   return lines.slice(0, 2);
 }
 function treeMap(key, nodes) {
-  const t = MX.TREE[key], L = treeLayout(), p = P();
+  const t = MX.TREE[key], L = treeLayout(t), p = P();
   const isFocus = key === p.primary || key === p.secondary;
   const nextIds = t.nodes.filter(function (n) { return nodes[n.id].unlocked && !nodes[n.id].mastered; }).sort(function (a, b) { return a.row - b.row || MX.rank(nodes[b.id].tier) - MX.rank(nodes[a.id].tier); }).slice(0, 2).map(function (n) { return n.id; });
   const z = A.zoom;
   const svg = s('svg', { viewBox: '0 0 ' + L.W + ' ' + L.H, width: Math.round(L.W * z * (window.innerWidth > 560 ? 1.35 : 1)), role: 'group', 'aria-label': MX.SKILLS[key].name + ' skill tree', style: 'max-width:none' });
   // branch labels
   t.branches.forEach(function (b, r) {
-    const y = r < 4 ? L.rowY(r) - 44 : L.rowY(4) - 44;
+    const y = L.rowY(r) - 44;
     svg.appendChild(s('text', { x: 14, y: y, fill: '#8E9BB0', 'font-size': 11, 'font-family': 'Barlow Condensed, Arial Narrow, sans-serif', 'font-weight': 600, 'letter-spacing': '1.6', text: b.name.toUpperCase() }));
     svg.appendChild(s('line', { x1: 14 + b.name.length * 7.2 + 8, x2: L.W - 14, y1: y - 4, y2: y - 4, stroke: '#1B2432', 'stroke-width': 1 }));
   });
@@ -144,7 +156,7 @@ function treeMap(key, nodes) {
       let d;
       const top = y1 + 27, bot = y2 - (n.boss ? 31 : 27);
       if (r.row === n.row) d = 'M' + (x1 + 27) + ' ' + y1 + ' L' + (x2 - 27) + ' ' + y2;
-      else if (n.row - r.row === 1 || (n.boss && r.row === 3)) { const my = (top + bot) / 2; d = 'M' + x1 + ' ' + top + ' C' + x1 + ' ' + my + ' ' + x2 + ' ' + my + ' ' + x2 + ' ' + bot; }
+      else if (n.row - r.row === 1) { const my = (top + bot) / 2; d = 'M' + x1 + ' ' + top + ' C' + x1 + ' ' + my + ' ' + x2 + ' ' + my + ' ' + x2 + ' ' + bot; }
       else {
         // Skips a row: run down a gutter between columns so the line never crosses a node or its label.
         const ch = x1 === x2 ? (x1 < 180 ? 121 : 239) : (Math.abs(x1 - x2) > 150 ? (x1 < x2 ? 121 : 239) : (x1 + x2) / 2);

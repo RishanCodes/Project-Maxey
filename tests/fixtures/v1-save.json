@@ -1,0 +1,2073 @@
+{
+ "app": "project-maxey-ascension",
+ "v": 1,
+ "exportedAt": "2026-09-20T12:00:00Z",
+ "state": {
+  "v": 1,
+  "createdAt": 1794328374288,
+  "updatedAt": 1794328374288,
+  "onboarded": true,
+  "obStep": 0,
+  "profile": {
+   "name": "Legacy",
+   "grade": "Grade 8",
+   "level": "club",
+   "position": "Combo guard",
+   "role": "Primary ball-handler and downhill scorer",
+   "style": [
+    "Quick downhill guard",
+    "Strong first step",
+    "Comfortable handling",
+    "Aggressive rim attacker",
+    "Pull-up shooting"
+   ],
+   "inspiration": "Tyrese Maxey: speed, change of pace, attacking decisions, pull-up shooting",
+   "strengths": [
+    "bh",
+    "sep",
+    "def"
+   ],
+   "strengthNotes": "Ball handling, first-step quickness, downhill attacking, defensive potential",
+   "needs": [
+    "sep",
+    "sht",
+    "fin",
+    "cond",
+    "iq"
+   ],
+   "needNotes": "Maintaining separation after beating a defender, consistent shooting under pressure, finishing consistency, conditioning and fatigue, decision-making under pressure",
+   "goals": [
+    "Keep the advantage after my first step",
+    "Make pull-ups under pressure",
+    "Finish more consistently"
+   ],
+   "goalText": "",
+   "duration": 45,
+   "primary": "fin",
+   "secondary": "str",
+   "courtAnytime": false,
+   "homeHoop": false,
+   "openSpace": true,
+   "gymAccess": true,
+   "equipment": [
+    "db",
+    "bench",
+    "band",
+    "box",
+    "mb",
+    "mat"
+   ],
+   "strengthExp": "little",
+   "supervision": false,
+   "partner": "sometimes",
+   "limitations": "",
+   "units": "kg"
+  },
+  "schedule": {
+   "events": [
+    {
+     "id": "mwawsahcm99s01",
+     "type": "school",
+     "title": "School",
+     "day": 1,
+     "start": "08:30",
+     "end": "15:15",
+     "repeat": "weekly"
+    },
+    {
+     "id": "mwawsahcau8dm2",
+     "type": "school",
+     "title": "School",
+     "day": 2,
+     "start": "08:30",
+     "end": "15:15",
+     "repeat": "weekly"
+    },
+    {
+     "id": "mwawsahcs9e463",
+     "type": "school",
+     "title": "School",
+     "day": 3,
+     "start": "08:30",
+     "end": "15:15",
+     "repeat": "weekly"
+    },
+    {
+     "id": "mwawsahcowglm4",
+     "type": "school",
+     "title": "School",
+     "day": 4,
+     "start": "08:30",
+     "end": "15:15",
+     "repeat": "weekly"
+    },
+    {
+     "id": "mwawsahcjl4xw5",
+     "type": "school",
+     "title": "School",
+     "day": 5,
+     "start": "08:30",
+     "end": "15:15",
+     "repeat": "weekly"
+    },
+    {
+     "id": "mwawsahcmfrq22",
+     "type": "practice",
+     "title": "School team practice",
+     "day": 2,
+     "start": "15:30",
+     "end": "17:00",
+     "repeat": "weekly"
+    },
+    {
+     "id": "mwawsahcndl034",
+     "type": "practice",
+     "title": "School team practice",
+     "day": 4,
+     "start": "15:30",
+     "end": "17:00",
+     "repeat": "weekly"
+    },
+    {
+     "id": "mwawsahc3rtmr6",
+     "type": "practice",
+     "title": "Club practice",
+     "day": 6,
+     "start": "10:00",
+     "end": "12:00",
+     "repeat": "weekly"
+    },
+    {
+     "id": "mwawsahc3sjew5",
+     "type": "game",
+     "title": "School game",
+     "day": 5,
+     "start": "16:30",
+     "end": "18:00",
+     "repeat": "weekly"
+    },
+    {
+     "id": "mwawsahcm7i8z1",
+     "type": "court",
+     "title": "Gym open (court)",
+     "day": 1,
+     "start": "15:30",
+     "end": "17:30",
+     "repeat": "weekly"
+    },
+    {
+     "id": "mwawsahc0xei43",
+     "type": "court",
+     "title": "Gym open (court)",
+     "day": 3,
+     "start": "15:30",
+     "end": "17:30",
+     "repeat": "weekly"
+    },
+    {
+     "id": "mwawsahckk2y70",
+     "type": "court",
+     "title": "Park court",
+     "day": 0,
+     "start": "13:00",
+     "end": "15:00",
+     "repeat": "weekly"
+    },
+    {
+     "id": "mwawsahcxyzaj1",
+     "type": "gym",
+     "title": "Weight room open",
+     "day": 1,
+     "start": "15:30",
+     "end": "16:30",
+     "repeat": "weekly"
+    },
+    {
+     "id": "mwawsahciv4223",
+     "type": "gym",
+     "title": "Weight room open",
+     "day": 3,
+     "start": "15:30",
+     "end": "16:30",
+     "repeat": "weekly"
+    },
+    {
+     "id": "mwawsahc1wkrc1",
+     "type": "free",
+     "title": "Free time",
+     "day": 1,
+     "start": "17:30",
+     "end": "19:00",
+     "repeat": "weekly"
+    },
+    {
+     "id": "mwawsahcj3ibr3",
+     "type": "free",
+     "title": "Free time",
+     "day": 3,
+     "start": "17:30",
+     "end": "19:00",
+     "repeat": "weekly"
+    },
+    {
+     "id": "mwawsahcjv3up0",
+     "type": "free",
+     "title": "Free time",
+     "day": 0,
+     "start": "12:00",
+     "end": "17:00",
+     "repeat": "weekly"
+    }
+   ],
+   "skips": {}
+  },
+  "logs": [
+   {
+    "id": "v1-0",
+    "ts": 1,
+    "kind": "quest",
+    "qid": "fin-mikan",
+    "date": "2026-09-01",
+    "makes": 18,
+    "att": 20,
+    "dur": 10
+   },
+   {
+    "id": "v1-1",
+    "ts": 2,
+    "kind": "quest",
+    "qid": "fin-weak",
+    "date": "2026-09-01",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-2",
+    "ts": 3,
+    "kind": "quest",
+    "qid": "fin-footwork",
+    "date": "2026-09-01",
+    "makes": 18,
+    "att": 20,
+    "dur": 15
+   },
+   {
+    "id": "v1-3",
+    "ts": 4,
+    "kind": "quest",
+    "qid": "fin-floater",
+    "date": "2026-09-01",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-4",
+    "ts": 5,
+    "kind": "quest",
+    "qid": "fin-inside",
+    "date": "2026-09-01",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-5",
+    "ts": 6,
+    "kind": "quest",
+    "qid": "fin-angles",
+    "date": "2026-09-01",
+    "makes": 18,
+    "att": 20,
+    "dur": 15
+   },
+   {
+    "id": "v1-6",
+    "ts": 7,
+    "kind": "quest",
+    "qid": "fin-race",
+    "date": "2026-09-01",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-7",
+    "ts": 8,
+    "kind": "quest",
+    "qid": "sep-first",
+    "date": "2026-09-01",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-8",
+    "ts": 9,
+    "kind": "quest",
+    "qid": "sep-hipline",
+    "date": "2026-09-01",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-9",
+    "ts": 10,
+    "kind": "quest",
+    "qid": "sht-form",
+    "date": "2026-09-01",
+    "makes": 18,
+    "att": 20,
+    "dur": 10
+   },
+   {
+    "id": "v1-10",
+    "ts": 11,
+    "kind": "quest",
+    "qid": "sht-5spot",
+    "date": "2026-09-01",
+    "makes": 18,
+    "att": 20,
+    "dur": 15
+   },
+   {
+    "id": "v1-11",
+    "ts": 12,
+    "kind": "quest",
+    "qid": "bh-pound",
+    "date": "2026-09-01",
+    "makes": 18,
+    "att": 20,
+    "dur": 10
+   },
+   {
+    "id": "v1-12",
+    "ts": 13,
+    "kind": "quest",
+    "qid": "fin-contact",
+    "date": "2026-09-01",
+    "makes": 12,
+    "att": 16,
+    "dur": 12
+   },
+   {
+    "id": "v1-13",
+    "ts": 14,
+    "kind": "gym",
+    "wid": "w-move",
+    "date": "2026-09-01",
+    "dur": 25,
+    "rpe": 6,
+    "ex": [
+     {
+      "id": "pogo",
+      "sets": 2,
+      "reps": "10",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "snapdown",
+      "sets": 3,
+      "reps": "3–5",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "latbound",
+      "sets": 3,
+      "reps": "3 / side",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "decel",
+      "sets": 3,
+      "reps": "3",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "fallstart",
+      "sets": 4,
+      "reps": "1 x 10 m",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "calf",
+      "sets": 2,
+      "reps": "12 / side",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     }
+    ]
+   },
+   {
+    "id": "v1-14",
+    "ts": 15,
+    "kind": "gym",
+    "wid": "w-foundA",
+    "date": "2026-09-01",
+    "dur": 40,
+    "rpe": 7,
+    "ex": [
+     {
+      "id": "snapdown",
+      "sets": 2,
+      "reps": "3",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "goblet",
+      "sets": 3,
+      "reps": "8",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "pushup",
+      "sets": 3,
+      "reps": "8–12",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "dbrow",
+      "sets": 3,
+      "reps": "10 / side",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "rdl",
+      "sets": 2,
+      "reps": "10",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "deadbug",
+      "sets": 2,
+      "reps": "8 / side",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     }
+    ]
+   },
+   {
+    "id": "v1-15",
+    "ts": 16,
+    "kind": "quest",
+    "qid": "fin-mikan",
+    "date": "2026-09-03",
+    "makes": 18,
+    "att": 20,
+    "dur": 10
+   },
+   {
+    "id": "v1-16",
+    "ts": 17,
+    "kind": "quest",
+    "qid": "fin-weak",
+    "date": "2026-09-03",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-17",
+    "ts": 18,
+    "kind": "quest",
+    "qid": "fin-footwork",
+    "date": "2026-09-03",
+    "makes": 18,
+    "att": 20,
+    "dur": 15
+   },
+   {
+    "id": "v1-18",
+    "ts": 19,
+    "kind": "quest",
+    "qid": "fin-floater",
+    "date": "2026-09-03",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-19",
+    "ts": 20,
+    "kind": "quest",
+    "qid": "fin-inside",
+    "date": "2026-09-03",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-20",
+    "ts": 21,
+    "kind": "quest",
+    "qid": "fin-angles",
+    "date": "2026-09-03",
+    "makes": 18,
+    "att": 20,
+    "dur": 15
+   },
+   {
+    "id": "v1-21",
+    "ts": 22,
+    "kind": "quest",
+    "qid": "fin-race",
+    "date": "2026-09-03",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-22",
+    "ts": 23,
+    "kind": "quest",
+    "qid": "sep-first",
+    "date": "2026-09-03",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-23",
+    "ts": 24,
+    "kind": "quest",
+    "qid": "sep-hipline",
+    "date": "2026-09-03",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-24",
+    "ts": 25,
+    "kind": "quest",
+    "qid": "sht-form",
+    "date": "2026-09-03",
+    "makes": 18,
+    "att": 20,
+    "dur": 10
+   },
+   {
+    "id": "v1-25",
+    "ts": 26,
+    "kind": "quest",
+    "qid": "sht-5spot",
+    "date": "2026-09-03",
+    "makes": 18,
+    "att": 20,
+    "dur": 15
+   },
+   {
+    "id": "v1-26",
+    "ts": 27,
+    "kind": "quest",
+    "qid": "bh-pound",
+    "date": "2026-09-03",
+    "makes": 18,
+    "att": 20,
+    "dur": 10
+   },
+   {
+    "id": "v1-27",
+    "ts": 28,
+    "kind": "quest",
+    "qid": "fin-contact",
+    "date": "2026-09-03",
+    "makes": 12,
+    "att": 16,
+    "dur": 12
+   },
+   {
+    "id": "v1-28",
+    "ts": 29,
+    "kind": "gym",
+    "wid": "w-move",
+    "date": "2026-09-03",
+    "dur": 25,
+    "rpe": 6,
+    "ex": [
+     {
+      "id": "pogo",
+      "sets": 2,
+      "reps": "10",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "snapdown",
+      "sets": 3,
+      "reps": "3–5",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "latbound",
+      "sets": 3,
+      "reps": "3 / side",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "decel",
+      "sets": 3,
+      "reps": "3",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "fallstart",
+      "sets": 4,
+      "reps": "1 x 10 m",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "calf",
+      "sets": 2,
+      "reps": "12 / side",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     }
+    ]
+   },
+   {
+    "id": "v1-29",
+    "ts": 30,
+    "kind": "gym",
+    "wid": "w-foundA",
+    "date": "2026-09-03",
+    "dur": 40,
+    "rpe": 7,
+    "ex": [
+     {
+      "id": "snapdown",
+      "sets": 2,
+      "reps": "3",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "goblet",
+      "sets": 3,
+      "reps": "8",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "pushup",
+      "sets": 3,
+      "reps": "8–12",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "dbrow",
+      "sets": 3,
+      "reps": "10 / side",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "rdl",
+      "sets": 2,
+      "reps": "10",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "deadbug",
+      "sets": 2,
+      "reps": "8 / side",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     }
+    ]
+   },
+   {
+    "id": "v1-30",
+    "ts": 31,
+    "kind": "quest",
+    "qid": "fin-mikan",
+    "date": "2026-09-05",
+    "makes": 18,
+    "att": 20,
+    "dur": 10
+   },
+   {
+    "id": "v1-31",
+    "ts": 32,
+    "kind": "quest",
+    "qid": "fin-weak",
+    "date": "2026-09-05",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-32",
+    "ts": 33,
+    "kind": "quest",
+    "qid": "fin-footwork",
+    "date": "2026-09-05",
+    "makes": 18,
+    "att": 20,
+    "dur": 15
+   },
+   {
+    "id": "v1-33",
+    "ts": 34,
+    "kind": "quest",
+    "qid": "fin-floater",
+    "date": "2026-09-05",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-34",
+    "ts": 35,
+    "kind": "quest",
+    "qid": "fin-inside",
+    "date": "2026-09-05",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-35",
+    "ts": 36,
+    "kind": "quest",
+    "qid": "fin-angles",
+    "date": "2026-09-05",
+    "makes": 18,
+    "att": 20,
+    "dur": 15
+   },
+   {
+    "id": "v1-36",
+    "ts": 37,
+    "kind": "quest",
+    "qid": "fin-race",
+    "date": "2026-09-05",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-37",
+    "ts": 38,
+    "kind": "quest",
+    "qid": "sep-first",
+    "date": "2026-09-05",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-38",
+    "ts": 39,
+    "kind": "quest",
+    "qid": "sep-hipline",
+    "date": "2026-09-05",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-39",
+    "ts": 40,
+    "kind": "quest",
+    "qid": "sht-form",
+    "date": "2026-09-05",
+    "makes": 18,
+    "att": 20,
+    "dur": 10
+   },
+   {
+    "id": "v1-40",
+    "ts": 41,
+    "kind": "quest",
+    "qid": "sht-5spot",
+    "date": "2026-09-05",
+    "makes": 18,
+    "att": 20,
+    "dur": 15
+   },
+   {
+    "id": "v1-41",
+    "ts": 42,
+    "kind": "quest",
+    "qid": "bh-pound",
+    "date": "2026-09-05",
+    "makes": 18,
+    "att": 20,
+    "dur": 10
+   },
+   {
+    "id": "v1-42",
+    "ts": 43,
+    "kind": "quest",
+    "qid": "fin-contact",
+    "date": "2026-09-05",
+    "makes": 12,
+    "att": 16,
+    "dur": 12
+   },
+   {
+    "id": "v1-43",
+    "ts": 44,
+    "kind": "gym",
+    "wid": "w-move",
+    "date": "2026-09-05",
+    "dur": 25,
+    "rpe": 6,
+    "ex": [
+     {
+      "id": "pogo",
+      "sets": 2,
+      "reps": "10",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "snapdown",
+      "sets": 3,
+      "reps": "3–5",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "latbound",
+      "sets": 3,
+      "reps": "3 / side",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "decel",
+      "sets": 3,
+      "reps": "3",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "fallstart",
+      "sets": 4,
+      "reps": "1 x 10 m",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "calf",
+      "sets": 2,
+      "reps": "12 / side",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     }
+    ]
+   },
+   {
+    "id": "v1-44",
+    "ts": 45,
+    "kind": "gym",
+    "wid": "w-foundA",
+    "date": "2026-09-05",
+    "dur": 40,
+    "rpe": 7,
+    "ex": [
+     {
+      "id": "snapdown",
+      "sets": 2,
+      "reps": "3",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "goblet",
+      "sets": 3,
+      "reps": "8",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "pushup",
+      "sets": 3,
+      "reps": "8–12",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "dbrow",
+      "sets": 3,
+      "reps": "10 / side",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "rdl",
+      "sets": 2,
+      "reps": "10",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "deadbug",
+      "sets": 2,
+      "reps": "8 / side",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     }
+    ]
+   },
+   {
+    "id": "v1-45",
+    "ts": 46,
+    "kind": "quest",
+    "qid": "fin-mikan",
+    "date": "2026-09-08",
+    "makes": 18,
+    "att": 20,
+    "dur": 10
+   },
+   {
+    "id": "v1-46",
+    "ts": 47,
+    "kind": "quest",
+    "qid": "fin-weak",
+    "date": "2026-09-08",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-47",
+    "ts": 48,
+    "kind": "quest",
+    "qid": "fin-footwork",
+    "date": "2026-09-08",
+    "makes": 18,
+    "att": 20,
+    "dur": 15
+   },
+   {
+    "id": "v1-48",
+    "ts": 49,
+    "kind": "quest",
+    "qid": "fin-floater",
+    "date": "2026-09-08",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-49",
+    "ts": 50,
+    "kind": "quest",
+    "qid": "fin-inside",
+    "date": "2026-09-08",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-50",
+    "ts": 51,
+    "kind": "quest",
+    "qid": "fin-angles",
+    "date": "2026-09-08",
+    "makes": 18,
+    "att": 20,
+    "dur": 15
+   },
+   {
+    "id": "v1-51",
+    "ts": 52,
+    "kind": "quest",
+    "qid": "fin-race",
+    "date": "2026-09-08",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-52",
+    "ts": 53,
+    "kind": "quest",
+    "qid": "sep-first",
+    "date": "2026-09-08",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-53",
+    "ts": 54,
+    "kind": "quest",
+    "qid": "sep-hipline",
+    "date": "2026-09-08",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-54",
+    "ts": 55,
+    "kind": "quest",
+    "qid": "sht-form",
+    "date": "2026-09-08",
+    "makes": 18,
+    "att": 20,
+    "dur": 10
+   },
+   {
+    "id": "v1-55",
+    "ts": 56,
+    "kind": "quest",
+    "qid": "sht-5spot",
+    "date": "2026-09-08",
+    "makes": 18,
+    "att": 20,
+    "dur": 15
+   },
+   {
+    "id": "v1-56",
+    "ts": 57,
+    "kind": "quest",
+    "qid": "bh-pound",
+    "date": "2026-09-08",
+    "makes": 18,
+    "att": 20,
+    "dur": 10
+   },
+   {
+    "id": "v1-57",
+    "ts": 58,
+    "kind": "quest",
+    "qid": "fin-contact",
+    "date": "2026-09-08",
+    "makes": 12,
+    "att": 16,
+    "dur": 12
+   },
+   {
+    "id": "v1-58",
+    "ts": 59,
+    "kind": "gym",
+    "wid": "w-move",
+    "date": "2026-09-08",
+    "dur": 25,
+    "rpe": 6,
+    "ex": [
+     {
+      "id": "pogo",
+      "sets": 2,
+      "reps": "10",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "snapdown",
+      "sets": 3,
+      "reps": "3–5",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "latbound",
+      "sets": 3,
+      "reps": "3 / side",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "decel",
+      "sets": 3,
+      "reps": "3",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "fallstart",
+      "sets": 4,
+      "reps": "1 x 10 m",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "calf",
+      "sets": 2,
+      "reps": "12 / side",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     }
+    ]
+   },
+   {
+    "id": "v1-59",
+    "ts": 60,
+    "kind": "gym",
+    "wid": "w-foundA",
+    "date": "2026-09-08",
+    "dur": 40,
+    "rpe": 7,
+    "ex": [
+     {
+      "id": "snapdown",
+      "sets": 2,
+      "reps": "3",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "goblet",
+      "sets": 3,
+      "reps": "8",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "pushup",
+      "sets": 3,
+      "reps": "8–12",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "dbrow",
+      "sets": 3,
+      "reps": "10 / side",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "rdl",
+      "sets": 2,
+      "reps": "10",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "deadbug",
+      "sets": 2,
+      "reps": "8 / side",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     }
+    ]
+   },
+   {
+    "id": "v1-60",
+    "ts": 61,
+    "kind": "quest",
+    "qid": "fin-mikan",
+    "date": "2026-09-10",
+    "makes": 18,
+    "att": 20,
+    "dur": 10
+   },
+   {
+    "id": "v1-61",
+    "ts": 62,
+    "kind": "quest",
+    "qid": "fin-weak",
+    "date": "2026-09-10",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-62",
+    "ts": 63,
+    "kind": "quest",
+    "qid": "fin-footwork",
+    "date": "2026-09-10",
+    "makes": 18,
+    "att": 20,
+    "dur": 15
+   },
+   {
+    "id": "v1-63",
+    "ts": 64,
+    "kind": "quest",
+    "qid": "fin-floater",
+    "date": "2026-09-10",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-64",
+    "ts": 65,
+    "kind": "quest",
+    "qid": "fin-inside",
+    "date": "2026-09-10",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-65",
+    "ts": 66,
+    "kind": "quest",
+    "qid": "fin-angles",
+    "date": "2026-09-10",
+    "makes": 18,
+    "att": 20,
+    "dur": 15
+   },
+   {
+    "id": "v1-66",
+    "ts": 67,
+    "kind": "quest",
+    "qid": "fin-race",
+    "date": "2026-09-10",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-67",
+    "ts": 68,
+    "kind": "quest",
+    "qid": "sep-first",
+    "date": "2026-09-10",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-68",
+    "ts": 69,
+    "kind": "quest",
+    "qid": "sep-hipline",
+    "date": "2026-09-10",
+    "makes": 18,
+    "att": 20,
+    "dur": 12
+   },
+   {
+    "id": "v1-69",
+    "ts": 70,
+    "kind": "quest",
+    "qid": "sht-form",
+    "date": "2026-09-10",
+    "makes": 18,
+    "att": 20,
+    "dur": 10
+   },
+   {
+    "id": "v1-70",
+    "ts": 71,
+    "kind": "quest",
+    "qid": "sht-5spot",
+    "date": "2026-09-10",
+    "makes": 18,
+    "att": 20,
+    "dur": 15
+   },
+   {
+    "id": "v1-71",
+    "ts": 72,
+    "kind": "quest",
+    "qid": "bh-pound",
+    "date": "2026-09-10",
+    "makes": 18,
+    "att": 20,
+    "dur": 10
+   },
+   {
+    "id": "v1-72",
+    "ts": 73,
+    "kind": "quest",
+    "qid": "fin-contact",
+    "date": "2026-09-10",
+    "makes": 12,
+    "att": 16,
+    "dur": 12
+   },
+   {
+    "id": "v1-73",
+    "ts": 74,
+    "kind": "gym",
+    "wid": "w-move",
+    "date": "2026-09-10",
+    "dur": 25,
+    "rpe": 6,
+    "ex": [
+     {
+      "id": "pogo",
+      "sets": 2,
+      "reps": "10",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "snapdown",
+      "sets": 3,
+      "reps": "3–5",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "latbound",
+      "sets": 3,
+      "reps": "3 / side",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "decel",
+      "sets": 3,
+      "reps": "3",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "fallstart",
+      "sets": 4,
+      "reps": "1 x 10 m",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "calf",
+      "sets": 2,
+      "reps": "12 / side",
+      "load": "",
+      "tech": "solid",
+      "done": true
+     }
+    ]
+   },
+   {
+    "id": "v1-74",
+    "ts": 75,
+    "kind": "gym",
+    "wid": "w-foundA",
+    "date": "2026-09-10",
+    "dur": 40,
+    "rpe": 7,
+    "ex": [
+     {
+      "id": "snapdown",
+      "sets": 2,
+      "reps": "3",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "goblet",
+      "sets": 3,
+      "reps": "8",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "pushup",
+      "sets": 3,
+      "reps": "8–12",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "dbrow",
+      "sets": 3,
+      "reps": "10 / side",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "rdl",
+      "sets": 2,
+      "reps": "10",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     },
+     {
+      "id": "deadbug",
+      "sets": 2,
+      "reps": "8 / side",
+      "load": "12",
+      "tech": "solid",
+      "done": true
+     }
+    ]
+   },
+   {
+    "id": "v1-75",
+    "ts": 76,
+    "kind": "quest",
+    "qid": "boss-fin",
+    "date": "2026-09-12",
+    "makes": 24,
+    "att": 30,
+    "dur": 20
+   },
+   {
+    "id": "v1-76",
+    "ts": 77,
+    "kind": "game",
+    "date": "2026-09-06",
+    "context": "game",
+    "reports": [
+     {
+      "skill": "fin",
+      "result": "worked",
+      "node": "fin.d3"
+     }
+    ]
+   },
+   {
+    "id": "v1-77",
+    "ts": 78,
+    "kind": "game",
+    "date": "2026-09-13",
+    "context": "game",
+    "reports": [
+     {
+      "skill": "fin",
+      "result": "worked",
+      "node": "fin.d3"
+     }
+    ]
+   },
+   {
+    "id": "v1-78",
+    "ts": 79,
+    "kind": "rest",
+    "date": "2026-09-07"
+   }
+  ],
+  "readiness": {
+   "2026-09-01": {
+    "level": "fresh",
+    "sore": "none"
+   }
+  },
+  "insights": {
+   "conv": {
+    "until": "2026-12-01"
+   }
+  },
+  "prefs": {
+   "title": "",
+   "tree": "sep",
+   "zoom": 1
+  },
+  "today": null
+ },
+ "expected": {
+  "asOf": "2026-09-20",
+  "xp": 3311,
+  "level": 12,
+  "achieved": [
+   "first",
+   "ten",
+   "twentyfive",
+   "fifty",
+   "gym1",
+   "technique",
+   "game1",
+   "balanced",
+   "bench1",
+   "pressure1",
+   "game1node",
+   "branch",
+   "boss1",
+   "partner5",
+   "transfer"
+  ],
+  "prs": 0,
+  "tiers": {
+   "fin.a1": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "fin.a2": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "fin.a3": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "fin.b1": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "fin.b2": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "fin.b3": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "fin.c1": {
+    "tier": "pressure",
+    "unlocked": true,
+    "mastered": true
+   },
+   "fin.c2": {
+    "tier": "pressure",
+    "unlocked": true,
+    "mastered": true
+   },
+   "fin.c3": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "fin.d1": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "fin.d2": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "fin.d3": {
+    "tier": "game",
+    "unlocked": true,
+    "mastered": true
+   },
+   "fin.boss": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "sht.a1": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "sht.a2": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "sht.a3": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "sht.b1": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "sht.b2": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "sht.b3": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "sht.c1": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "sht.c2": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "sht.c3": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "sht.d1": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "sht.d2": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "sht.d3": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "sht.boss": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "bh.a1": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "bh.a2": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "bh.a3": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "bh.b1": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "bh.b2": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "bh.b3": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "bh.c1": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "bh.c2": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "bh.c3": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "bh.d1": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "bh.d2": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "bh.d3": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "bh.boss": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "sep.a1": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "sep.a2": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "sep.a3": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "sep.b1": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "sep.b2": {
+    "tier": "pressure",
+    "unlocked": true,
+    "mastered": true
+   },
+   "sep.b3": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "sep.c1": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "sep.c2": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "sep.c3": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "sep.d1": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "sep.d2": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "sep.d3": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "sep.boss": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "iq.a1": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "iq.a2": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "iq.a3": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "iq.b1": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "iq.b2": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "iq.b3": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "iq.c1": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "iq.c2": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "iq.c3": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "iq.d1": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "iq.d2": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "iq.d3": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "iq.boss": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "def.a1": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "def.a2": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "def.a3": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "def.b1": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "def.b2": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "def.b3": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "def.c1": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "def.c2": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "def.c3": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "def.d1": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "def.d2": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "def.d3": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "def.boss": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "cond.a1": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "cond.a2": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "cond.a3": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "cond.b1": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "cond.b2": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "cond.b3": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "cond.c1": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "cond.c2": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "cond.c3": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "cond.d1": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "cond.d2": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "cond.d3": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "cond.boss": {
+    "tier": "locked",
+    "unlocked": false,
+    "mastered": false
+   },
+   "str.a1": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "str.a2": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "str.a3": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "str.b1": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "str.b2": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "str.b3": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "str.c1": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "str.c2": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "str.c3": {
+    "tier": "benchmark",
+    "unlocked": true,
+    "mastered": true
+   },
+   "str.d1": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "str.d2": {
+    "tier": "pressure",
+    "unlocked": true,
+    "mastered": true
+   },
+   "str.d3": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   },
+   "str.boss": {
+    "tier": "available",
+    "unlocked": true,
+    "mastered": false
+   }
+  }
+ }
+}

@@ -120,7 +120,8 @@
   MX.lastLegStrength = function (state, todayKey) {
     let best = null;
     state.logs.forEach(function (l) {
-      if ((l.kind === 'gym' || l.kind === 'custom') && legsRank(logLegs(l)) >= 2 && l.date <= todayKey) { if (!best || l.date > best) best = l.date; }
+      const athletic = l.kind === 'quest' && MX.QUEST[l.qid] && MX.QUEST[l.qid].type === 'athletic';
+      if ((l.kind === 'gym' || l.kind === 'custom' || athletic) && legsRank(logLegs(l)) >= 2 && l.date <= todayKey) { if (!best || l.date > best) best = l.date; }
     });
     for (let i = 0; i < 4; i++) {
       const k = addDays(todayKey, -i);
@@ -378,7 +379,7 @@
       if (r >= rank('game')) { tierCounts.game++; award(o.ev && o.ev.last || todayKey, 'Game-applied: ' + n.name, 60, false); }
     });
     MX.TREES.forEach(function (t) {
-      for (let row = 0; row < 4; row++) {
+      for (let row = 0; row < t.branches.length - 1; row++) {
         const ns = t.nodes.filter(function (n) { return n.row === row; });
         if (ns.length && ns.every(function (n) { return tree.nodes[n.id].mastered; })) fullBranches++;
       }
@@ -551,6 +552,8 @@
     else if (recent >= 6) { maxLoad = Math.min(maxLoad, 2); notes.push('Solid workload recently, so the most demanding options are filtered out.'); }
     const lastLegs = MX.lastLegStrength(state, key);
     const legsStrengthRecent = lastLegs && daysBetween(lastLegs, key) < 2;
+    // Explosive work needs freshness: never on top of a practice or game day, the day before a game, a heavy stretch, or when tired/sore.
+    const explosiveBlock = !!(practiceToday || gameToday || gameTomorrow || recent >= 6 || (ready && (ready.level !== 'fresh' || ready.sore === 'high' || ready.pain)));
 
     // --- location
     let loc = ctx.loc || 'auto';
@@ -610,7 +613,9 @@
       if (q.load > maxLoad) return;
       if (legsRank(q.legs) > maxLegs) return;
       if (q.type === 'boss') { const bn = tree.nodes[q.nodes[0]]; if (!bn.unlocked || bn.mastered) return; }
-      if (q.nodes.length && !q.nodes.some(function (n) { return tree.nodes[n] && tree.nodes[n].unlocked; })) return; // advanced content waits for readiness
+      if (q.nodes.length && !q.baseline && !q.nodes.some(function (n) { return tree.nodes[n] && tree.nodes[n].unlocked; })) return; // advanced content waits for readiness (baselines are the test-in route)
+      if (q.type === 'athletic' && explosiveBlock) return;
+      if (q.type === 'athletic' && legsRank(q.legs) >= 2 && legsStrengthRecent) return;
       if (q.type === 'cond' && (recent >= 6 || practiceLater)) return; // no extra conditioning on top of heavy practice load
       let s = 0;
       Object.keys(q.skills).forEach(function (k) { s += Math.max(-0.1, deficit[k]) * 100 * q.skills[k]; });
@@ -628,6 +633,7 @@
         else if (!due) s -= 15;
       }
       if (q.type === 'boss') { s += 6; why.push('Boss challenge unlocked. A milestone test of this tree.'); }
+      if (q.type === 'athletic') why.push('No practice or game close by and you are fresh, so explosive work can be done at full quality.');
       if (q.type === 'recovery') s += maxLoad <= 1 ? 30 : -20;
       s += Math.max(0, 5 - Math.abs(minutes - q.dur) / 5);
       if (q.stage === 2) s += 2;
@@ -644,6 +650,7 @@
       if (legsRank(w.legs) > maxLegs) return;
       if (legsRank(w.legs) >= 2 && legsStrengthRecent) return;
       if (legsRank(w.legs) >= 2 && practiceLater) return;
+      if (w.explosive && explosiveBlock) return;
       const r = MX.resolveWorkout(state, w); if (!r.ok) return;
       let s = Math.max(-0.1, deficit.str) * 100;
       const why = baseReasons({ str: 1 });

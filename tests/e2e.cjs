@@ -46,6 +46,11 @@ const file = path.join(out, 'page.html'); fs.writeFileSync(file, html);
   await page.click('.seg button:has-text("Weight room")'); await overflow('weight room'); await shot('weightroom');
   await page.click('.item:has-text("Foundation A")'); await page.click('.sheet .start'); await page.waitForSelector('#log-gym');
   await page.click('.sheet .chip:has-text("Solid")'); await shot('gym-run'); await page.click('#log-gym'); await page.waitForSelector('#reward-ok'); await page.click('#reward-ok'); ok('workout logged');
+  await page.waitForSelector('#explosive-list'); await page.locator('#explosive-list').scrollIntoViewIfNeeded(); await shot('explosive-list');
+  await page.click('#explosive-list .item:has-text("Jump-Landing Mechanics")'); await page.waitForSelector('.sheet .start'); await shot('explosive-detail'); await page.click('.sheet .start');
+  await page.fill('#in-makes', '14'); await page.dispatchEvent('#in-makes', 'change'); await page.fill('#in-att', '15'); await page.dispatchEvent('#in-att', 'change');
+  await page.click('#log-quest'); await page.waitForSelector('#reward-ok');
+  if (!/Jumping and landing mechanics/.test(await page.textContent('.sheet'))) throw new Error('landing baseline did not unlock str.c1'); await page.click('#reward-ok'); ok('explosiveness drill logged and unlocks jump-and-land');
   await page.click('#btn-custom'); await page.click('#log-custom'); await page.waitForSelector('#reward-ok'); await page.click('#reward-ok'); ok('coach workout logged');
   // game report
   await page.click('.seg button:has-text("Game application")'); await page.click('#btn-report'); await page.click('.sheet .chip:has-text("Mixed")'); await page.click('#log-report'); await page.waitForSelector('#reward-ok'); await page.click('#reward-ok'); ok('game report logged');
@@ -53,6 +58,8 @@ const file = path.join(out, 'page.html'); fs.writeFileSync(file, html);
   await page.click('nav button:has-text("Progress")'); await page.waitForSelector('#treewrap'); await overflow('trees'); await shot('tree');
   await page.click('.chips.scroll .chip:has-text("Finishing")'); await page.waitForTimeout(40); await shot('tree-fin');
   await page.click('.tnode[data-node="fin.b1"]'); await page.waitForSelector('.sheet'); await shot('node'); await page.click('.sheet .iconbtn'); ok('node panel opens');
+  await page.click('.tnode[data-node="fin.e1"]'); await page.waitForSelector('.sheet'); if (!/Contact finishing/.test(await page.textContent('.sheet'))) throw new Error('contact node sheet'); await shot('contact-node'); await page.click('.sheet .iconbtn'); ok('contact branch node opens');
+  await page.locator('#treewrap').screenshot({ path: path.join(out, 'tree-fin-full.png') });
   await page.click('.tnode[data-node="fin.c2"]'); await page.waitForSelector('.sheet'); await page.click('.sheet .iconbtn');
   await page.click('[aria-label="Zoom in"]'); await page.click('[aria-label="Zoom out"]');
   for (const segName of ['Assessment', 'Records', 'Awards', 'History']) { await page.click('.seg button:has-text("' + segName + '")'); await page.waitForTimeout(40); await overflow(segName); await shot(segName.toLowerCase()); }
@@ -73,6 +80,13 @@ const file = path.join(out, 'page.html'); fs.writeFileSync(file, html);
   await page.reload(); await page.waitForSelector('#start-quest');
   const after = await page.evaluate(() => MX.Store.state.logs.length);
   if (before !== after || before < 5) throw new Error('persistence: ' + before + ' vs ' + after); ok('reload restores ' + after + ' logs and skips onboarding');
+  // legacy (pre-update) save through the real Import screen
+  const legacy = fs.readFileSync(path.join(__dirname, 'fixtures', 'v1-save.json'), 'utf8');
+  await page.click('nav button:has-text("Profile")'); await page.click('#btn-import'); await page.fill('#import-text', legacy); await page.click('#import-check'); await page.waitForSelector('#import-go'); await page.click('#import-go');
+  await page.reload(); await page.waitForSelector('#start-quest');
+  const lv = await page.evaluate(() => MX.progress(MX.Store.state, '2026-09-20').level.level); if (lv < 12) throw new Error('legacy level ' + lv);
+  await page.click('nav button:has-text("Progress")'); await page.click('.seg button:has-text("Skill trees")'); await page.click('.chips.scroll .chip:has-text("Finishing")'); await overflow('legacy finishing tree');
+  await page.locator('#treewrap').screenshot({ path: path.join(out, 'tree-legacy.png') }); ok('legacy save imports, survives reload, level ' + lv);
   // desktop width
   await page.setViewportSize({ width: 1100, height: 900 }); await page.waitForTimeout(50); await overflow('desktop'); await shot('desktop');
   await page.setViewportSize({ width: 320, height: 640 }); for (const t of ['Home', 'Train', 'Progress', 'Schedule', 'Profile']) { await page.click('nav button:has-text("' + t + '")'); await overflow('320px ' + t); }

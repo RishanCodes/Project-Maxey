@@ -6,8 +6,8 @@ A mobile-first basketball player-development RPG that runs as a single Claude Ar
 
 | Path | What it holds |
 | --- | --- |
-| `src/data-trees.js` | 8 skill categories and 8 skill trees (4 branches × 3 nodes + 1 boss = 104 nodes), prerequisites, goals, cross-tree links |
-| `src/data-quests.js` | 76 basketball quests: skill quests, baselines, boss challenges, team/game missions, film study, conditioning, recovery |
+| `src/data-trees.js` | 8 skill categories and 8 skill trees (4–5 branches × 3 nodes + 1 boss = 107 nodes), prerequisites, goals, cross-tree links |
+| `src/data-quests.js` | 86 quests: skill quests, baselines, boss challenges, contact finishing, explosiveness drills, team/game missions, film study, conditioning, recovery |
 | `src/data-gym.js` | 29 exercises, 6 workout templates, achievements, level titles, starter schedule, event types |
 | `src/engine.js` | Pure logic: schedule, workload, evidence → node tiers, XP ledger, insights (weakness detection), recommendation engine, integrity checks |
 | `src/store.js` | Persistence: Claude account storage (`db` capability), browser storage cache, export/import |
@@ -19,7 +19,7 @@ A mobile-first basketball player-development RPG that runs as a single Claude Ar
 
 ```sh
 node build.mjs                 # -> dist/index.html
-node tests/engine.test.cjs     # 48 engine tests (recommendations, tiers, XP, insights, gym)
+node tests/engine.test.cjs     # 66 engine tests (recommendations, tiers, XP, insights, gym, contact, explosiveness, legacy saves)
 node tests/e2e.cjs [outdir]    # Playwright UI flow at phone width (needs the `playwright` package and Chromium)
 ```
 
@@ -32,6 +32,9 @@ node tests/e2e.cjs [outdir]    # Playwright UI flow at phone width (needs the `p
 - **XP limits.** One XP award per activity per day, daily cap of 250, PRs only on full-size sessions with a previous result to beat.
 - **Workload.** Practices and games count as load. Very fatigued, pain, game tomorrow/today, practice later, heavy recent load and recent leg strength sessions all cap what is recommended. Rest is always available and never penalized.
 - **Specialization** re-weights recommendations (about 45/25/30) and never resets progress.
+- **Contact finishing** (Finishing tree): balance and body control → finishing through controlled contact → live play. Contact is only through a pad or a vertical defender, on the floor, at the gather, controlled by the partner; never shoving, never in the air. Every partner drill has a solo alternative.
+- **Explosiveness** (Strength & explosiveness tree): acceleration, jumping and landing, deceleration and change of direction, scored on quality with low volume. Explosive drills are only recommended on fresh days with no practice that day, no game today or tomorrow, no heavy recent load and no leg-heavy session in the last 48 hours.
+- **Legacy saves**: `tests/fixtures/v1-save.json` is a save made before these additions; tests confirm it keeps every unlock, mastery, achievement and its XP.
 
 ## Saving
 

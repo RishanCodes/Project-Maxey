@@ -28,7 +28,7 @@
       });
     });
     nodes.forEach(function (n) { n.req = n.req.map(function (r) { return r.indexOf('.') > 0 ? r : key + '.' + r; }); });
-    const b = Object.assign({ tree: key, branch: 'Boss', row: 4, col: 1, boss: true, goal: 'benchmark', x: [] }, boss,
+    const b = Object.assign({ tree: key, branch: 'Boss', row: branches.length, col: 1, boss: true, goal: 'benchmark', x: [] }, boss,
       { id: key + '.boss' });
     b.req = b.req.map(function (r) { return key + '.' + r; });
     nodes.push(b);
@@ -47,6 +47,11 @@
         { id: 'b2', name: 'Inside-hand finishes', short: 'Inside hand', req: ['a2', 'a3'], goal: 'benchmark', purpose: 'Use the hand closest to the defender with control to finish around their body.' },
         { id: 'b3', name: 'Reverse finishes', short: 'Reverses', req: ['a3'], goal: 'benchmark', purpose: 'Use the rim as protection when a shot blocker is coming from the front side.' }
       ] },
+      { name: 'Contact finishing', blurb: 'Stay balanced, protect the ball and finish through legal, controlled contact.', nodes: [
+        { id: 'e1', name: 'Balance and body control', short: 'Body control', req: ['a3'], goal: 'benchmark', x: ['str.a3', 'str.b1'], purpose: 'Gather on a wide, braced base and keep your balance and the ball when you are knocked slightly off your line.' },
+        { id: 'e2', name: 'Finishing through controlled contact', short: 'Through contact', req: ['e1'], goal: 'pressure', x: ['str.d2'], purpose: 'Absorb a controlled bump at the gather and still finish with the correct hand, instead of fading away or avoiding the rim.' },
+        { id: 'e3', name: 'Contact finishing in live play', short: 'Live contact', req: ['e2'], goal: 'game', purpose: 'Finish through real, legal contact in practices and games, and earn and-ones and free throws.' }
+      ] },
       { name: 'Applied finishing', blurb: 'Finishing at speed, from angles, against bodies.', nodes: [
         { id: 'c1', name: 'Finishing from different angles', short: 'Angles', req: ['a1', 'a2'], goal: 'pressure', purpose: 'Finish from the slot, wing, corner and baseline at game speed, not just straight-on.' },
         { id: 'c2', name: 'Finishing against recovering defenders', short: 'Vs recovery', req: ['b1', 'b2', 'a3'], goal: 'pressure', x: ['sep.b2'], purpose: 'Protect the ball and pick the right hand when the defender you beat is chasing your hip.' },
@@ -57,7 +62,7 @@
         { id: 'd2', name: 'Selecting finishes in live play', short: 'Finish menu', req: ['c1', 'c3'], goal: 'game', purpose: 'Use your full finishing menu in live play instead of forcing one move.' },
         { id: 'd3', name: 'Consistent application against defenders', short: 'Consistency', req: ['c1', 'c2'], goal: 'game', purpose: 'Finish at a steady rate against real defenders across many games.' }
       ] }
-    ], { name: 'Boss: The Finishing Gauntlet', short: 'Gauntlet', req: ['c1', 'c2', 'c3'], need: 2, purpose: 'A standardized finishing test across angles, hands and finish types. Clearing it shows your finishing holds up when the menu is mixed.' })
+    ], { name: 'Boss: The Finishing Gauntlet', short: 'Gauntlet', req: ['c1', 'c2', 'c3', 'e2'], need: 2, purpose: 'A standardized finishing test across angles, hands and finish types. Clearing it shows your finishing holds up when the menu is mixed.' })
   ];
 
   MX.TREES.push(
@@ -210,14 +215,14 @@
         { id: 'b2', name: 'Upper-body push and pull balance', short: 'Push / pull', req: ['a3'], goal: 'benchmark', purpose: 'Build balanced upper-body strength for contact and ball protection.' },
         { id: 'b3', name: 'Loaded lower-body strength', short: 'Loaded legs', req: ['a1', 'a2'], need: 2, goal: 'benchmark', purpose: 'Add gradual load to squat and hinge patterns once technique is consistent.' }
       ] },
-      { name: 'Explosiveness', blurb: 'Land, stop and start well.', nodes: [
-        { id: 'c1', name: 'Landing and deceleration', short: 'Land & stop', req: ['a1', 'b1'], goal: 'benchmark', purpose: 'Absorb force quietly and under control. The base for safe jumping and cutting.' },
-        { id: 'c2', name: 'Acceleration mechanics', short: 'Accelerate', req: ['a3', 'b1'], goal: 'benchmark', x: ['sep.a1'], purpose: 'Use body lean and powerful pushes to start fast.' },
-        { id: 'c3', name: 'Change-of-direction mechanics', short: 'Cut', req: ['c1'], goal: 'benchmark', x: ['sep.c2'], purpose: 'Plant, stop, and redirect with control.' }
+      { name: 'Explosiveness', blurb: 'Accelerate, jump and land, stop and change direction with control.', nodes: [
+        { id: 'c1', name: 'Jumping and landing mechanics', short: 'Jump & land', req: ['a1', 'b1'], goal: 'benchmark', x: ['fin.e1'], purpose: 'Take off with a good hip hinge and arm swing, and land quietly with knees tracking over toes. The base for safe jumping, rebounding and finishing.' },
+        { id: 'c2', name: 'Acceleration mechanics', short: 'Accelerate', req: ['a3', 'b1'], goal: 'benchmark', x: ['sep.a1'], purpose: 'Use forward lean and powerful pushes to start fast from a basketball stance. Your first step, trained as a skill.' },
+        { id: 'c3', name: 'Deceleration and change of direction', short: 'Stop & cut', req: ['c1'], goal: 'benchmark', x: ['sep.c2', 'def.a3'], purpose: 'Stop in a few controlled steps with hips low, then plant and redirect. This is how quick guards create and keep separation without wrecking their knees.' }
       ] },
       { name: 'Applied athleticism', blurb: 'Power and strength in a basketball context.', nodes: [
-        { id: 'd1', name: 'Low-volume power', short: 'Power', req: ['c1'], goal: 'benchmark', purpose: 'Small doses of jumps and throws done with full intent and perfect landings.' },
-        { id: 'd2', name: 'Strength through contact', short: 'Contact', req: ['b2', 'b3'], goal: 'pressure', x: ['fin.c2'], purpose: 'Stay balanced and finish through a bump.' },
+        { id: 'd1', name: 'Low-volume power', short: 'Power', req: ['c1'], goal: 'benchmark', purpose: 'Small doses of jumps, approach jumps and throws done with full intent and perfect landings. Quality over volume.' },
+        { id: 'd2', name: 'Strength through contact', short: 'Contact', req: ['b2', 'b3'], goal: 'pressure', x: ['fin.c2', 'fin.e2'], purpose: 'Stay balanced and finish through a bump.' },
         { id: 'd3', name: 'Game-speed movement', short: 'Game speed', req: ['c2', 'c3'], goal: 'game', purpose: 'You feel your movement quality in games. Self-reported, not a measured speed gain.' }
       ] }
     ], { name: 'Boss: Movement Quality Screen', short: 'Screen', req: ['b1', 'c1', 'c3'], need: 2, purpose: 'A technique screen: controlled single-leg work and stuck landings on both sides. It checks quality, not maximal strength.' })

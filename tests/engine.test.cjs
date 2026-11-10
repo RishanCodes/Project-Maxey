@@ -13,7 +13,7 @@ function allRecs(r) { return [r.main].concat(r.alts).concat(r.all); }
 
 console.log('Data integrity');
 t('no integrity errors', () => assert.deepEqual(MX.integrity(), []));
-t('every tree has 13 nodes incl. boss', () => MX.TREES.forEach(tr => assert.equal(tr.nodes.length, 13)));
+t('every tree has 4–5 full branches plus a boss', () => MX.TREES.forEach(tr => { assert.equal(tr.nodes.length, (tr.branches.length - 1) * 3 + 1); assert.equal(tr.nodes.find(n => n.boss).row, tr.branches.length - 1); }));
 t('targets sum to 1 and respect 45/25', () => { const tg = MX.targets(MX.defaultProfile()); const sum = Object.values(tg).reduce((a, b) => a + b, 0); assert.ok(Math.abs(sum - 1) < 1e-9); assert.equal(tg.sep, 0.45); assert.equal(tg.sht, 0.25); });
 
 console.log('Scheduling');
@@ -57,7 +57,7 @@ t('recent heavy-leg gym session blocks another', () => {
 });
 t('pain flag -> no training load', () => { const s = fresh(s => { s.readiness['2026-11-09'] = { level: 'fresh', pain: true }; }); const r = rec(s, { key: '2026-11-09' }); assert.ok(r.notes.some(x => /healthcare/.test(x))); assert.equal(r.caps.maxLoad, 0); });
 t('short time window filters long quests', () => { const s = fresh(); rec(s, { key: '2026-11-09', minutes: 10 }).all.forEach(c => assert.ok((c.kind === 'gym' ? c.w.dur : c.q.dur) <= 15)); });
-t('locked advanced quests are not recommended', () => { const s = fresh(); const r = rec(s, { key: '2026-11-09', partner: true }); const tr = MX.computeTree(s).nodes; r.all.forEach(c => { if (c.kind === 'quest' && c.q.nodes.length) assert.ok(c.q.nodes.some(nn => tr[nn].unlocked), c.q.id); }); });
+t('locked advanced quests are not recommended', () => { const s = fresh(); const r = rec(s, { key: '2026-11-09', partner: true }); const tr = MX.computeTree(s).nodes; r.all.forEach(c => { if (c.kind === 'quest' && c.q.nodes.length && !c.q.baseline) assert.ok(c.q.nodes.some(nn => tr[nn].unlocked), c.q.id); }); });
 t('primary specialization dominates a fresh recommendation', () => { const s = fresh(); const r = rec(s, { key: '2026-11-09', nowMin: 15 * 60 }); const top = r.all.slice(0, 5).map(c => c.kind === 'gym' ? 'str' : c.q.skill); assert.ok(top.includes('sep'), top.join(',')); });
 t('recommendation explains itself', () => { const s = fresh(); const r = rec(s, { key: '2026-11-09', nowMin: 15 * 60 }); assert.ok(r.main.why.length > 0); });
 
@@ -112,6 +112,70 @@ t('progression only after two solid sessions at manageable effort', () => {
   s.logs.push({ id: 'b', kind: 'gym', wid: 'w-foundA', date: '2026-11-04', rpe: 7, ex: [{ id: 'goblet', done: true, tech: 'solid' }] });
   assert.equal(MX.progressionHint(s, 'goblet').kind, 'up');
 });
+
+
+console.log('Contact finishing');
+const legs3 = ['2026-11-01', '2026-11-03', '2026-11-05'];
+t('contact branch exists inside Finishing with balance → contact → live play', () => { ['fin.e1', 'fin.e2', 'fin.e3'].forEach(id => assert.equal(MX.NODES[id].branch, 'Contact finishing')); assert.equal(MX.NODES['fin.e3'].goal, 'game'); assert.equal(MX.NODES['fin.e2'].goal, 'pressure'); });
+t('contact branch unlocks from footwork, then in order', () => {
+  const s = fresh(); let tr = MX.computeTree(s).nodes; assert.ok(!tr['fin.e1'].unlocked);
+  legs3.forEach(d => qlog(s, 'fin-footwork', d, 18, 20)); tr = MX.computeTree(s).nodes; assert.ok(tr['fin.e1'].unlocked); assert.ok(!tr['fin.e2'].unlocked);
+  legs3.forEach(d => qlog(s, 'fin-ct-balance', d, 18, 20)); tr = MX.computeTree(s).nodes; assert.equal(tr['fin.e1'].tier, 'benchmark'); assert.ok(tr['fin.e2'].unlocked); assert.ok(!tr['fin.e3'].unlocked);
+  legs3.forEach(d => qlog(s, 'fin-ct-cue', d, 16, 20)); tr = MX.computeTree(s).nodes; assert.equal(tr['fin.e2'].tier, 'pressure'); assert.ok(tr['fin.e2'].mastered); assert.ok(tr['fin.e3'].unlocked);
+  s.logs.push({ id: 'g1', kind: 'game', date: '2026-11-06', reports: [{ skill: 'fin', result: 'worked', node: 'fin.e3' }] }, { id: 'g2', kind: 'game', date: '2026-11-08', reports: [{ skill: 'fin', result: 'worked', node: 'fin.e3' }] });
+  assert.equal(MX.computeTree(s).nodes['fin.e3'].tier, 'game');
+});
+t('every contact quest explains purpose and transfer, and partner versions have a solo alternative', () => {
+  const cq = MX.QUESTS.filter(q => q.nodes.some(n => /^fin\.e/.test(n)));
+  assert.ok(cq.length >= 6);
+  cq.forEach(q => { assert.ok(q.purpose && q.transfer, q.id); if (q.partner) { assert.ok(q.alt, q.id + ' alt'); assert.equal(MX.QUEST[q.alt].partner, 0); } });
+});
+t('contact drills never include shoving or contact in the air', () => {
+  MX.QUESTS.filter(q => q.nodes.some(n => /^fin\.e/.test(n)) && q.partner).forEach(q => { const txt = q.steps.join(' ').toLowerCase(); assert.ok(/no shoving/.test(txt) && /(never contact in the air|no contact once you leave the floor)/.test(txt), q.id); });
+});
+t('solo player gets contact quests, never partner contact quests', () => {
+  const s = fresh(s => { s.profile.primary = 'fin'; }); legs3.forEach(d => qlog(s, 'fin-footwork', d, 18, 20)); legs3.forEach(d => qlog(s, 'fin-ct-balance', d, 18, 20));
+  const r = rec(s, { key: '2026-11-09', nowMin: 15 * 60, partner: false });
+  assert.ok(r.all.some(c => c.q && c.q.id === 'fin-ct-cue')); assert.ok(!r.all.some(c => c.q && (c.q.id === 'fin-contact' || c.q.id === 'fin-ct-live')));
+  const r2 = rec(s, { key: '2026-11-09', nowMin: 15 * 60, partner: true }); assert.ok(r2.all.some(c => c.q && (c.q.id === 'fin-contact' || c.q.id === 'fin-ct-live')));
+});
+
+console.log('Explosiveness');
+t('explosiveness branch covers acceleration, jump/land, decel and change of direction', () => { const names = ['str.c1', 'str.c2', 'str.c3', 'str.d1'].map(id => MX.NODES[id].name.toLowerCase()).join(' | '); ['accelerat', 'jump', 'landing', 'decelerat', 'change of direction'].forEach(w => assert.ok(names.includes(w), w)); });
+const athKeys = () => MX.QUESTS.filter(q => q.type === 'athletic').map(q => q.id);
+t('explosiveness drills have measurable benchmarks', () => { athKeys().forEach(id => { const q = MX.QUEST[id]; assert.equal(q.measure.kind, 'makes'); assert.ok(q.bench > 0 && q.measure.att > 0); assert.ok(q.prog && q.regr && q.equipText); }); });
+t('fresh, free day -> explosiveness offered (baseline first)', () => { const s = fresh(s => { s.readiness['2026-11-09'] = { level: 'fresh', sore: 'none' }; }); const r = rec(s, { key: '2026-11-09', nowMin: 15 * 60 }); assert.ok(r.all.some(c => c.q && c.q.id === 'ath-land')); assert.ok(!r.all.some(c => c.q && c.q.id === 'ath-jump'), 'jumps wait for landing node'); });
+t('practice day -> no explosiveness work', () => { const s = fresh(); const r = rec(s, { key: TODAY, nowMin: 18 * 60 }); r.all.forEach(c => { assert.ok(!(c.q && c.q.type === 'athletic'), c.id); assert.ok(!(c.w && c.w.explosive), c.id); }); });
+t('day before a game -> no explosiveness work', () => { const s = fresh(); rec(s, { key: '2026-11-12', nowMin: 18 * 60 }).all.forEach(c => assert.ok(!(c.q && c.q.type === 'athletic'))); });
+t('tired -> no explosiveness work', () => { const s = fresh(s => { s.readiness['2026-11-09'] = { level: 'tired', sore: 'none' }; }); rec(s, { key: '2026-11-09', nowMin: 15 * 60 }).all.forEach(c => assert.ok(!(c.q && c.q.type === 'athletic'))); });
+t('heavy recent load -> no explosiveness work', () => { const s = fresh(); ['2026-11-07', '2026-11-08'].forEach(d => { qlog(s, 'cond-repeat', d, 5, 6); qlog(s, 'sep-first', d, 15, 20); }); rec(s, { key: '2026-11-09', nowMin: 15 * 60 }).all.forEach(c => assert.ok(!(c.q && c.q.type === 'athletic'))); });
+t('landing baseline at 90%+ unlocks jump-and-land node and then approach jumps', () => {
+  const s = fresh(); qlog(s, 'ath-land', '2026-11-08', 14, 15);
+  assert.ok(MX.computeTree(s).nodes['str.c1'].unlocked);
+  const r = rec(s, { key: '2026-11-09', nowMin: 15 * 60, minutes: 30 }); assert.ok(r.all.some(c => c.q && c.q.id === 'ath-jump'));
+});
+t('explosiveness drills alone can master the branch', () => {
+  const s = fresh(); qlog(s, 'ath-land', '2026-10-30', 14, 15);
+  legs3.forEach(d => { qlog(s, 'ath-land', d, 14, 15); qlog(s, 'ath-decel', d, 11, 12); qlog(s, 'ath-jump', d, 9, 9); });
+  s.logs.push(...legs3.map((d, i) => ({ id: 'w' + i, kind: 'gym', wid: 'w-home', date: d, ts: i, ex: [{ id: 'split', done: true, tech: 'solid' }, { id: 'deadbug', done: true, tech: 'solid' }] })));
+  legs3.forEach(d => qlog(s, 'ath-accel', d, 7, 8));
+  const tr = MX.computeTree(s).nodes; ['str.c1', 'str.c2', 'str.c3', 'str.d1'].forEach(id => assert.ok(tr[id].mastered, id + ' ' + tr[id].tier));
+});
+t('moderate-leg explosive drill blocks another within 48 h', () => { const s = fresh(); qlog(s, 'ath-land', '2026-11-05', 14, 15); qlog(s, 'ath-cod', '2026-11-08', 10, 12); assert.equal(MX.lastLegStrength(s, '2026-11-09'), '2026-11-08'); rec(s, { key: '2026-11-09', nowMin: 15 * 60 }).all.forEach(c => { if (c.q && c.q.type === 'athletic') assert.ok(MX.legsRank(c.q.legs) < 2, c.q.id); }); });
+t('explosiveness counts toward strength assessment and XP once per day', () => { const s = fresh(); qlog(s, 'ath-decel', TODAY, 10, 12); const st = MX.skillStats(s, TODAY, 0); assert.equal(st.str.st1.att, 12); const x = MX.progress(s, TODAY).xp; qlog(s, 'ath-decel', TODAY, 10, 12); assert.equal(MX.progress(s, TODAY).xp, x); });
+
+console.log('Legacy saves');
+t('pre-update save keeps every unlock, mastery, achievement and XP', () => {
+  const fx = require('./fixtures/v1-save.json'); const s = MX.migrate(JSON.parse(JSON.stringify(fx.state)));
+  const p = MX.progress(s, fx.expected.asOf);
+  assert.ok(p.xp >= fx.expected.xp, 'xp ' + p.xp + ' < ' + fx.expected.xp); assert.ok(p.level.level >= fx.expected.level);
+  fx.expected.achieved.forEach(a => assert.ok(p.achieved.includes(a), 'lost achievement ' + a));
+  assert.ok(p.prs.length >= fx.expected.prs);
+  Object.keys(fx.expected.tiers).forEach(id => { const o = fx.expected.tiers[id], n2 = p.tree.nodes[id]; assert.ok(n2, 'node vanished ' + id);
+    if (o.unlocked) assert.ok(n2.unlocked, 'lost unlock ' + id); if (o.mastered) assert.ok(n2.mastered, 'lost mastery ' + id); assert.ok(MX.rank(n2.tier) >= MX.rank(o.tier), 'tier dropped ' + id); });
+  assert.ok(s.onboarded, 'onboarding must not repeat');
+});
+t('old contact-pad logs now count toward the contact branch once it unlocks', () => { const fx = require('./fixtures/v1-save.json'); const p = MX.progress(MX.migrate(fx.state), fx.expected.asOf); const e2 = p.tree.nodes['fin.e2']; assert.ok(e2.ev && e2.ev.sessions >= 5); });
 
 console.log('Persistence model');
 t('migrate fills missing fields and drops bad logs', () => { const m = MX.migrate({ profile: { name: 'A' }, logs: [{ id: 'x', date: TODAY, kind: 'rest' }, null, { foo: 1 }] }); assert.equal(m.profile.name, 'A'); assert.equal(m.logs.length, 1); assert.ok(m.schedule.events); });

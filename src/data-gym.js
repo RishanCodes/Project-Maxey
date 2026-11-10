@@ -117,7 +117,7 @@
     { id: 'w-upper', name: 'Upper Body & Core (Game-Week Safe)', dur: 30, legs: 'none', load: 1, where: 'gym',
       purpose: 'Strength work that leaves your legs fresh for games and practices.',
       items: [['dbbench', 3, '8–10'], ['invrow', 3, '8–10'], ['kneelpress', 2, '8 / side'], ['dbrow', 2, '10 / side'], ['pallof', 2, '10 / side'], ['deadbug', 2, '8 / side']] },
-    { id: 'w-move', name: 'Landing & Movement Mechanics', dur: 25, legs: 'light', load: 1, where: 'any',
+    { id: 'w-move', name: 'Landing & Movement Mechanics', dur: 25, legs: 'light', load: 1, where: 'any', explosive: true,
       purpose: 'Low-volume jumping, landing, acceleration and deceleration technique.',
       items: [['pogo', 2, '10'], ['snapdown', 3, '3–5'], ['latbound', 3, '3 / side'], ['decel', 3, '3'], ['fallstart', 4, '1 x 10 m'], ['calf', 2, '12 / side']] },
     { id: 'w-home', name: 'At-Home Bodyweight Strength', dur: 25, legs: 'light', load: 1, where: 'home',

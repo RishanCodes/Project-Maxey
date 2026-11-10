@@ -2,7 +2,7 @@
 const SPACE_LABEL = { court: 'Court', hoop: 'Any hoop', home: 'At home', field: 'Open space', any: 'Anywhere' };
 const PARTNER_LABEL = ['Solo', 'Needs a helper', 'Needs a live defender'];
 const STAGE_LABEL = { 1: 'Technique', 2: 'Applied', 3: 'Game' };
-const KIND_LABEL = { skill: 'Skill quest', boss: 'Boss challenge', team: 'Practice mission', game: 'Game mission', film: 'Film study', recovery: 'Recovery', cond: 'Conditioning' };
+const KIND_LABEL = { skill: 'Skill quest', boss: 'Boss challenge', team: 'Practice mission', game: 'Game mission', film: 'Film study', recovery: 'Recovery', cond: 'Conditioning', athletic: 'Explosiveness' };
 
 function viewHome() {
   const k = today(), s0 = st(), prog = MX.progress(s0, k), ctx = todayCtx();
@@ -174,7 +174,7 @@ function nodeChip(id, tree) {
 }
 function questDetail(q, why) {
   const tree = MX.computeTree(st()).nodes;
-  const locked = q.nodes.length && !q.nodes.some(function (n) { return tree[n].unlocked; });
+  const locked = q.nodes.length && !q.baseline && !q.nodes.some(function (n) { return tree[n].unlocked; });
   openSheet({
     eyebrow: (KIND_LABEL[q.type] || 'Skill quest') + ' · ' + MX.SKILLS[q.skill].name, title: q.name,
     sub: [q.dur ? q.dur + ' min' : null, 'Difficulty ' + q.diff + '/3', STAGE_LABEL[q.stage], SPACE_LABEL[q.space], PARTNER_LABEL[q.partner]].filter(Boolean).join(' · '),
@@ -192,7 +192,7 @@ function questDetail(q, why) {
           h('dt', null, 'Progression'), h('dd', null, q.prog),
           h('dt', null, 'Regression'), h('dd', null, q.regr),
           h('dt', null, 'Recovery'), h('dd', null, q.recovery),
-          h('dt', null, 'Equipment'), h('dd', null, q.space === 'home' ? 'Ball (and a wall for passing drills)' : q.space === 'field' ? 'Open space, cones optional' : q.space === 'any' ? 'Your practice or game' : 'Ball and hoop. Cones or a chair help.')),
+          h('dt', null, 'Equipment'), h('dd', null, q.equipText ? q.equipText : q.space === 'home' ? 'Ball (and a wall for passing drills)' : q.space === 'field' ? 'Open space, cones optional' : q.space === 'any' ? 'Your practice or game' : 'Ball and hoop. Cones or a chair help.')),
         q.alt ? h('p', { class: 'small' }, 'No partner today? Solo alternative: ', h('button', { class: 'link', onclick: function () { closeSheet(); questDetail(MX.QUEST[q.alt]); } }, MX.QUEST[q.alt].name)) : null,
         q.nodes.length ? h('div', { class: 'stack' }, h('div', { class: 'eyebrow' }, 'Skill-tree nodes this builds'), h('div', { class: 'chips' }, q.nodes.map(function (n) { return nodeChip(n, { nodes: tree }); }))) : null
       ];

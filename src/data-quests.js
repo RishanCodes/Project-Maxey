@@ -107,13 +107,47 @@
     prog: 'Make the cue later (at the elbow).', regr: 'Know the cue before you start the rep.',
     recovery: 'Low to moderate load.' });
 
-  q({ id: 'fin-contact', name: 'Contact Finishing with Pad', skill: 'fin', nodes: ['fin.c2', 'str.d2'], skills: { fin: 0.7, str: 0.3 }, stage: 2, diff: 3, dur: 12, partner: 1, alt: 'fin-race',
+  /* ---- Contact finishing branch. Safety rules for every contact quest: contact only on the floor at the gather,
+     only through a pad or the defender's chest/vertical body, partner controls the intensity, never in the air, no shoving. ---- */
+  q({ id: 'fin-ct-balance', equipText: 'Ball and hoop.', name: 'Body-Control Gathers', skill: 'fin', nodes: ['fin.e1', 'fin.a3'], diff: 1, dur: 12, space: 'hoop',
+    measure: M('Balanced makes', 'Attempts', 20), bench: 0.7, load: 1, legs: 'light',
+    steps: ['Drive from the wing at 70–80% speed.', 'On every other rep, hop one step sideways off your line two dribbles before the gather, as if bumped. Recover your line.', 'Gather into a wide, braced two-foot jump stop: chest up, ball chinned, hold for one count.', 'Power up off two feet and finish. Counts only if you held the stop balanced and made it.'],
+    purpose: 'Builds the base, bracing and balance that contact finishing depends on, with no contact at all.',
+    transfer: 'Most lane contact knocks you slightly off line. Guards who stay balanced and braced finish through it; guards who are off balance fade or get blocked.',
+    prog: 'Shorten the hold, then gather off one foot after the side hop.', regr: 'Walk-speed gathers with a two-second hold.',
+    recovery: 'Low load. Fine on most days.' });
+
+  q({ id: 'fin-ct-protect', equipText: 'Ball and hoop. Pool noodle for the partner progression.', name: 'Ball-Security Finishes', skill: 'fin', nodes: ['fin.e1', 'bh.a3'], skills: { fin: 0.7, bh: 0.3 }, diff: 2, dur: 12, space: 'hoop',
+    measure: M('Protected makes', 'Attempts', 20), bench: 0.7, load: 1,
+    steps: ['Attack and rip the ball low-to-high across your body as you gather, away from an imagined reach.', 'Keep the ball tight to your chin or outside shoulder; keep your off-arm bent and close to your body (shield, never push off).', 'Finish with the hand away from the imagined defender. Alternate sides.', 'Counts only if the ball stayed protected the whole gather and you made it.'],
+    purpose: 'Teaches protecting the ball through the gather, where most strips and blocks happen.',
+    transfer: 'Defenders swipe down on the gather. A protected ball plus the far-hand finish turns contact into a foul call instead of a turnover.',
+    prog: 'Partner swipes at the ball (never the arms or body) with a pool noodle.', regr: 'Stationary rip-and-chin, then one dribble.',
+    recovery: 'Low load.' });
+
+  q({ id: 'fin-ct-cue', equipText: 'Ball, hoop, and a coin or random-number app.', name: 'Contact-Ready Finishes (Solo Cue)', skill: 'fin', nodes: ['fin.e2', 'fin.c2'], stage: 2, diff: 2, dur: 15, space: 'hoop',
+    measure: M('Correct makes', 'Attempts', 20), bench: 0.6, load: 2, legs: 'light',
+    steps: ['Use a random cue as you reach the 3-point line (coin or random-number app): contact left, contact right, or no contact.', 'Contact: two-foot gather, shoulders and hips braced toward the cue side, ball moved to the far side, finish with the far hand off the glass.', 'No contact: quick one-foot finish at full speed.', 'Counts only if your response matched the cue and you made it.'],
+    purpose: 'Solo route to applied contact finishing: a decision plus a braced, protected finish at game speed.',
+    transfer: 'In games you must read whether contact is coming and choose a braced finish or a quick one. This trains that choice without a partner.',
+    prog: 'Make the cue later (at the elbow), or use Controlled Pad Finishing with a partner.', regr: 'Know the cue before the rep starts.',
+    recovery: 'Moderate load.' });
+
+  q({ id: 'fin-contact', equipText: 'Ball, hoop, a partner and a pad or firm cushion.', name: 'Controlled Pad Finishing', skill: 'fin', nodes: ['fin.e2', 'fin.c2', 'str.d2'], skills: { fin: 0.7, str: 0.3 }, stage: 2, diff: 3, dur: 12, partner: 1, alt: 'fin-ct-cue',
     measure: M('Makes', 'Attempts', 16), bench: 0.55, load: 2,
-    steps: ['Partner holds a pad (or a firm cushion) and gives a light, controlled bump on your gather.', 'Absorb, stay balanced, and finish with the outside hand.', 'Partner adjusts contact to stay safe. Never hit in the air.'],
-    purpose: 'Teaches staying on balance through contact.',
-    transfer: 'Lane contact is constant. Finishing through it turns contact into and-ones.',
-    prog: 'Bump on the second step instead of the gather.', regr: 'Very light contact with a walk-through.',
+    steps: ['Partner stands still beside the lane holding a pad (or firm cushion) at chest height. They set the contact level and can stop any rep.', 'On your gather, while both your feet are on the floor, they lean the pad into your shoulder with light, steady pressure. No shoving, no swinging, never contact in the air.', 'Absorb with a wide base, keep the ball protected, and finish with the outside hand.', 'Start at walking pace and build to 70% speed only when every rep is controlled.'],
+    purpose: 'Applied finishing through controlled, predictable contact.',
+    transfer: 'Lane contact is constant. Finishing through it turns contact into and-ones instead of blocked shots.',
+    prog: 'Contact on the second step instead of the gather, still on the floor.', regr: 'Very light contact with a walk-through.',
     recovery: 'Moderate. Skip when sore or the day before a game.' });
+
+  q({ id: 'fin-ct-live', equipText: 'Ball, hoop, a defender and a pad.', name: 'Controlled Contact 1v1', skill: 'fin', nodes: ['fin.e2', 'str.d2'], skills: { fin: 0.7, str: 0.3 }, stage: 2, diff: 3, dur: 15, partner: 2, alt: 'fin-ct-cue',
+    measure: M('Finishes through contact', 'Possessions', 10), bench: 0.5, load: 2, legs: 'light',
+    steps: ['Defender starts in the lane holding a pad, feet set. You attack from the wing at 60–70% speed.', 'Defender may only stay vertical and meet you with the pad at the gather. No reaching for the body, no shoving, no contact once you leave the floor.', 'Finish through the pad contact. Count made finishes where you stayed balanced.', 'Either player can call "stop" at any time.'],
+    purpose: 'Live decisions against a defender who provides legal, controlled contact.',
+    transfer: 'The closest safe version of real paint contact: a defender walling up, which is exactly how refs expect defenders to play you.',
+    prog: 'Defender may step to cut off your line (still pad-only, feet on the floor).', regr: 'Defender stays fully stationary.',
+    recovery: 'Moderate. Not the day before a game.' });
 
   /* ---------------- SHOOTING ---------------- */
   q({ id: 'sht-form', name: 'Form Shooting Ladder', skill: 'sht', nodes: ['sht.a1'], diff: 1, dur: 10, space: 'hoop',
@@ -398,6 +432,45 @@
     purpose: 'Learn to bring your system down.', transfer: 'Dead-ball recovery and good sleep both help late-game performance.',
     prog: 'Use it between shooting sets.', regr: '2 minutes.', recovery: 'Recovery activity.' });
 
+  /* ---------------- ATHLETIC DEVELOPMENT: EXPLOSIVENESS ----------------
+     Quality-scored, low-volume, full rest between reps. Scheduled only on fresh days without practice or a game in the next 24 h. */
+  function ath(o) { q(Object.assign({ type: 'athletic', skill: 'str', space: 'field', diff: 1, dur: 15, load: 1, legs: 'light' }, o)); }
+  ath({ id: 'ath-land', equipText: 'A low, stable step or box (about 30 cm / 12 in) and a non-slip floor. No ball needed.', name: 'Jump-Landing Mechanics (Baseline)', nodes: ['str.c1', 'str.d1'], space: 'home', baseline: true, unlocks: { nodes: ['str.c1'], at: 0.9 },
+    measure: M('Stuck landings', 'Landings', 15), bench: 0.8,
+    steps: ['Warm up 5 minutes (easy jog, skips, leg swings).', '5 snap-downs: rise to your toes, snap into an athletic stance, land quietly and hold 2 seconds.', '5 step-off landings from a low, stable step (about 30 cm / 12 in): land on both feet and hold 2 seconds.', '5 jump-and-stick: small vertical jump with an arm swing, land and hold 2 seconds.', 'A landing counts as stuck if it was quiet, knees tracked over toes (no caving in) and you held still for 2 seconds. Rest 20–30 s between reps.'],
+    purpose: 'Standardized landing check and the technique base for every jump, rebound and finish.',
+    transfer: 'Controlled landings let you finish, rebound and cut repeatedly. Quiet landings mean the muscles absorb force instead of the joints.',
+    prog: 'Single-leg landings from the low step, or lateral hop-and-stick.', regr: 'Snap-downs only, slower.',
+    recovery: 'Low load. Use the same rules each time so results compare.' });
+  ath({ id: 'ath-accel', equipText: 'About 15 m of open, non-slip space and two markers.', name: 'Acceleration Starts from Stance', nodes: ['str.c2', 'sep.a1'], skills: { str: 0.7, sep: 0.3 }, load: 2,
+    measure: M('Clean starts', 'Starts', 8), bench: 0.75,
+    steps: ['Mark 10 m (about the free-throw line to half court and a bit).', 'Start from a basketball stance: 2 from triple threat, 2 from a defensive stance, 2 from a jab step, 2 after a crossover.', 'Push the ground back and keep a forward lean for the first 3–4 steps; do not pop upright.', 'Walk back slowly. Rest at least 45–60 s. A start is clean if your first two steps were low and powerful with no stutter.'],
+    purpose: 'Trains acceleration posture from the positions you actually start from in games.',
+    transfer: 'Your first step is a strength. Acceleration mechanics keep it sharp and extend it into steps 2–4, which is where advantages are kept.',
+    prog: 'Start on a partner\'s clap or a random timer (reaction), or with a ball.', regr: 'Wall-drive marches, then falling starts.',
+    recovery: 'Moderate on legs. Quality drops when tired: stop when starts get sloppy.' });
+  ath({ id: 'ath-decel', equipText: 'About 10 m of open, non-slip space and a marker.', name: 'Deceleration Ladder', nodes: ['str.c3', 'str.c1'], load: 1,
+    measure: M('Controlled stops', 'Stops', 12), bench: 0.75,
+    steps: ['Jog 5 m and stop in 3 steps, hips low, chest over knees. Hold the stop. 4 reps.', 'Run 5 m at 75% and stop in 3 steps. 4 reps.', 'Run 5 m at 75% and stop in 2 steps, finishing in a balanced stance. 4 reps.', 'A stop counts if knees stayed over toes (no caving), you did not slide or stumble, and you could have moved again immediately. Walk back to recover.'],
+    purpose: 'Teaches stopping under control, the most important part of change of direction.',
+    transfer: 'Hard stops create pull-up space and let you change direction without losing balance or loading your knees badly.',
+    prog: 'Stop into a pull-up stance with a ball, or into a defensive slide.', regr: 'Jog speed only, 3-step stops.',
+    recovery: 'Low to moderate load.' });
+  ath({ id: 'ath-cod', equipText: 'Two cones, open non-slip space, and a random-number app or a partner.', name: 'Reactive Change of Direction (Solo Cue)', nodes: ['str.c3', 'str.c2', 'sep.c2'], skills: { str: 0.7, sep: 0.3 }, stage: 2, diff: 2, load: 2, legs: 'moderate',
+    measure: M('Clean cuts', 'Reps', 12), bench: 0.7,
+    steps: ['Place two cones 3 m to your left and right. Start in a basketball stance in the middle.', 'Use a random cue (random-number app or a partner pointing): even = left, odd = right.', 'Push off, decelerate in 2–3 steps at the cone, plant and sprint back through the middle.', 'Rest 45 s. A cut counts if you reacted the right way, stopped balanced with knees tracking, and re-accelerated without a stumble.'],
+    purpose: 'Applies deceleration and acceleration together with a decision.',
+    transfer: 'Games are reactive. You cut because the defense moved, not on a plan. This links clean mechanics to reading a cue.',
+    prog: 'Add a ball, or a third cue (forward sprint).', regr: 'Known direction, half speed.',
+    recovery: 'Moderate on legs. Not within 24 hours of a game.' });
+  ath({ id: 'ath-jump', equipText: 'A hoop or backboard to reach toward, and a non-slip floor.', name: 'Approach Jump Series', nodes: ['str.d1', 'str.c1'], skills: { str: 0.8, fin: 0.2 }, diff: 2, load: 2, legs: 'moderate', space: 'court',
+    measure: M('Quality jumps', 'Jumps', 9), bench: 0.78,
+    steps: ['After a full warm-up, take 2–3 steps and jump off two feet (3 jumps), off your right foot (3) and off your left foot (3), reaching for the rim or backboard.', 'Full intent on every jump, then land and stick it.', 'Rest 60–90 s between jumps. This is about quality, not conditioning.', 'A jump counts if it was full intent AND the landing was quiet and balanced. Note your highest touch in the notes if you like.'],
+    purpose: 'Low-volume jumping power built on the landing technique you already own.',
+    transfer: 'Approach jumps mirror layups, rebounds and contests. Few, high-quality reps develop power without the fatigue of high-volume jumping.',
+    prog: 'Add one more jump per side, or a dribble into the approach.', regr: 'Two-foot jumps only, or Jump-Landing Mechanics.',
+    recovery: 'Moderate on legs. Never on top of practice, and not within 24 hours of a game.' });
+
   /* ---------------- RECOVERY ---------------- */
   q({ id: 'rec-mobility', name: 'Mobility Flow', skill: 'str', type: 'recovery', nodes: ['cond.c3', 'str.a1'], skills: { cond: 0.5, str: 0.5 }, diff: 1, dur: 12, space: 'home',
     measure: DONE, load: 0,
@@ -420,6 +493,9 @@
   mission({ id: 'tm-keep', name: 'Practice Mission: Keep the Advantage', skill: 'sep', nodes: ['sep.d1', 'sep.d3'], reportSkills: ['sep', 'fin'],
     steps: ['In team practice today, every time you beat your man: stay on the line past his hip.', 'Afterwards, note roughly how often you kept the advantage.'],
     purpose: 'Bring your main focus into team practice.', transfer: 'Practice reps against teammates are the bridge to games.', prog: '—', regr: '—', recovery: 'Uses practice time. No extra load.' });
+  mission({ id: 'tm-contact', name: 'Practice Mission: Finish Through Contact', skill: 'fin', nodes: ['fin.e3', 'fin.d3'], reportSkills: ['fin', 'str'],
+    steps: ['In team practice, when a defender walls up on your drive: wide gather, ball protected, finish with the far hand. Do not avoid the rim.', 'Never initiate dangerous contact. Play within the rules and your coach\'s instructions.', 'Afterwards, note how often you finished or drew the foul when contact came.'],
+    purpose: 'Bring contact finishing into practice against real defenders.', transfer: 'Live practice is the bridge between pad work and games.', prog: '—', regr: '—', recovery: 'Uses practice time. No extra load.' });
   mission({ id: 'tm-shot', name: 'Practice Mission: Shot Selection Check', skill: 'sht', nodes: ['sht.d1', 'sht.d2'], reportSkills: ['sht', 'iq'],
     steps: ['In scrimmage today, before each shot ask: is this a shot I make in training?', 'Note how many shots were good shots.'],
     purpose: 'Connect drill work to shot choices.', transfer: 'Good shot selection makes your percentage reflect your real skill.', prog: '—', regr: '—', recovery: 'No extra load.' });
@@ -429,7 +505,7 @@
   mission({ id: 'tm-pressure', name: 'Practice Mission: Calm Against Pressure', skill: 'bh', nodes: ['bh.d1', 'bh.d3'], reportSkills: ['bh', 'iq'],
     steps: ['When pressured in practice: protect, keep your eyes up, use a retreat dribble if needed.', 'Note turnovers and good escapes.'],
     purpose: 'Take ball protection into practice.', transfer: 'Pressure handling must hold up against real defenders.', prog: '—', regr: '—', recovery: 'No extra load.' });
-  mission({ id: 'gm-attack', name: 'Game Mission: Attack and Decide', type: 'game', skill: 'sep', nodes: ['sep.d1', 'sep.d2', 'fin.d1'], reportSkills: ['sep', 'fin', 'sht'],
+  mission({ id: 'gm-attack', name: 'Game Mission: Attack and Decide', type: 'game', skill: 'sep', nodes: ['sep.d1', 'sep.d2', 'fin.d1', 'fin.e3'], reportSkills: ['sep', 'fin', 'sht'],
     steps: ['Attack downhill when you have the first step. After separation, make the next decision fast: finish, pull up, or kick.', 'After the game, report what worked and what did not. Be honest. Mixed is normal.'],
     purpose: 'Apply your primary focus in a real game.', transfer: 'This is the stage that counts.', prog: '—', regr: '—', recovery: 'Game day: no hard training before the game.' });
   mission({ id: 'gm-shots', name: 'Game Mission: Quality Looks Only', type: 'game', skill: 'sht', nodes: ['sht.d1', 'sht.d3', 'sht.d2'], reportSkills: ['sht', 'iq'],
