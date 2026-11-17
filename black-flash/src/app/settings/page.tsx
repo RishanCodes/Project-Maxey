@@ -11,6 +11,7 @@ import { CONTEXT_LABEL, type ContextKey } from "@/lib/coach-context";
 import type { Preferences } from "@/lib/schema";
 import { CloudCard } from "@/components/settings/cloud-card";
 import { PushCard } from "@/components/settings/push-card";
+import { SoundSetting } from "@/components/settings/sound-setting";
 
 const ZONES = ["America/Los_Angeles", "America/Denver", "America/Chicago", "America/New_York", "America/Toronto", "Europe/London", "Europe/Berlin", "Asia/Tokyo", "Australia/Sydney", "UTC"];
 
@@ -40,6 +41,7 @@ export default function SettingsPage() {
           if (v && typeof Notification !== "undefined") { const p = await Notification.requestPermission(); if (p !== "granted") { toast("Notifications were not allowed by the browser."); return; } }
           set({ notifications: v });
         }} label="In-app habit reminders" description="Shown while the app is open. For reminders when it's closed, see below." />
+        <SoundSetting />
       </Card>
       <Card className="flex flex-col gap-3"><SectionHeader title="Onboarding" sub={prefs.onboarding.status === "defaults" ? "Started with defaults" : prefs.onboarding.completedAt ? "Completed" : "Not completed"} />
         <p className="text-sm text-muted">Retake or edit your answers. Your data stays; approving the plan again updates the same items instead of duplicating them.</p>

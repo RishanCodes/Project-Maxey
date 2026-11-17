@@ -1,4 +1,5 @@
 "use client";
+import { play } from "@/lib/sound";
 import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { Button, Chip, ConfirmSheet, Field, IconButton, Input, Select, Sheet, Switch, TextArea } from "../ui";
@@ -44,6 +45,7 @@ function TrainingFormBody({ open, onOpenChange, session, defaultDate, defaultSta
       effort, energy, soreness, focusAreas: focus, notes: notes.trim(), status: completed ? "completed" : "planned",
       drills: drills.filter((d) => d.name.trim()), shots: shots.filter((x) => x.label.trim()),
     });
+    play(s.status === "completed" ? "training" : "save");
     if (s.status === "completed") {
       const all = await getDb().training.toArray();
       const snap = { tasks: [], taskCompletions: [], habits: [], habitCompletions: [], goals: [], milestones: [], training: all, checkins: [], focus: [], xp: [] };

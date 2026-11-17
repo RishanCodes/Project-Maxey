@@ -7,6 +7,7 @@ import { getPrefs } from "@/lib/repo";
 import { usePrefs } from "@/hooks/use-data";
 import { HabitReminders } from "./reminders";
 import { SyncProvider } from "./sync";
+import { Celebrations } from "./celebrations";
 
 function Splash({ message }: { message?: string }) {
   return (
@@ -51,7 +52,7 @@ export function Providers({ children }: { children: ReactNode }) {
     <ToastProvider>
       <ServiceWorker />
       <HabitReminders />
-      <BootGate><SyncProvider>{children}</SyncProvider></BootGate>
+      <BootGate><SyncProvider><Celebrations />{children}</SyncProvider></BootGate>
     </ToastProvider>
   );
 }

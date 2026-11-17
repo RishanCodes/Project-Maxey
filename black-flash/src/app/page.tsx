@@ -1,4 +1,5 @@
 "use client";
+import { play } from "@/lib/sound";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -66,13 +67,15 @@ export default function TodayPage() {
   ].sort((a, b) => Number(a.kind === "task" ? a.occ.done : a.done) - Number(b.kind === "task" ? b.occ.done : b.done)).slice(0, MAX_TODAY_PRIORITIES);
 
   async function toggleTask(o: TaskOccurrence) {
-    if (o.done) { await uncompleteTask(o.task.id, o.date); toast("Marked not done"); return; }
+    if (o.done) { await uncompleteTask(o.task.id, o.date); play("undo"); toast("Marked not done"); return; }
     const xp = await completeTask(o.task.id, o.date);
+    play("complete");
     toast(`Done: ${o.task.title}${xp ? ` (+${xp} XP)` : ""}`, () => uncompleteTask(o.task.id, o.date));
   }
   async function toggleHabit(h: Habit, done: boolean) {
-    if (done) { await unmarkHabit(h.id, today); toast("Habit unchecked"); return; }
+    if (done) { await unmarkHabit(h.id, today); play("undo"); toast("Habit unchecked"); return; }
     const xp = await markHabit(h.id, today, "done");
+    play("habit");
     toast(`${h.label}${xp ? ` (+${xp} XP)` : ""}`, () => unmarkHabit(h.id, today));
   }
 

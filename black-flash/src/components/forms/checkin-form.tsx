@@ -1,4 +1,5 @@
 "use client";
+import { play } from "@/lib/sound";
 import { useEffect, useState } from "react";
 import { Button, Field, Input, Sheet, Switch, TextArea } from "../ui";
 import { ScaleChips, numOrUndef } from "./common";
@@ -22,6 +23,7 @@ export function CheckinForm({ open, onOpenChange, date }: { open: boolean; onOpe
     const h = numOrUndef(sleep);
     if (sleep && (h === undefined || h < 0 || h > 16)) return setError("Sleep hours should be between 0 and 16.");
     const xp = await saveCheckin({ date, sleepHours: h, sleepQuality: quality, energy, mood, soreness, restDay: rest, note: note.trim() });
+    play("save");
     toast(rest ? `Rest day logged${xp ? ` (+${xp} XP)` : ""}. Recovery counts.` : `Check-in saved${xp ? ` (+${xp} XP)` : ""}`);
     onOpenChange(false);
   }

@@ -310,3 +310,39 @@ test("15. without cloud configuration the app says so and stays fully local", as
   await expect(page.getByText(/Cloud sync isn't set up for this installation/)).toBeVisible();
   await expect(page.getByText(/Push isn't set up for this installation/)).toBeVisible();
 });
+
+test("16. sound effects play on completions and stay silent when turned off", async ({ page }) => {
+  // Count oscillator starts so the test can see sounds without hearing them.
+  await page.addInitScript(() => {
+    const w = window as unknown as { __tones: number };
+    w.__tones = 0;
+    const start = OscillatorNode.prototype.start;
+    OscillatorNode.prototype.start = function (...args: Parameters<typeof start>) { w.__tones++; return start.apply(this, args); };
+  });
+  const tones = () => page.evaluate(() => (window as unknown as { __tones: number }).__tones);
+  await startWithDefaults(page);
+  await page.getByRole("button", { name: "Add a task" }).click();
+  await page.getByLabel("Title").fill("Free throws");
+  await page.getByRole("button", { name: "Add task" }).click();
+  await page.getByRole("button", { name: "Mark done" }).click();
+  await expect(page.getByText(/Done: Free throws/)).toBeVisible();
+  await expect.poll(tones).toBeGreaterThan(0);
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+
+  await page.goto("/settings");
+  const sw = page.getByRole("switch", { name: "Sound effects" });
+  await expect(sw).toHaveAttribute("aria-checked", "true");
+  for (const name of ["Task", "Habit", "Training", "Milestone", "Focus", "Achievement", "Level up"]) await page.getByRole("button", { name, exact: true }).click();
+  await expect.poll(tones).toBeGreaterThan(20);
+  await sw.click();
+  await expect(sw).toHaveAttribute("aria-checked", "false");
+  await page.reload();
+  await expect(page.getByRole("switch", { name: "Sound effects" })).toHaveAttribute("aria-checked", "false"); // remembered
+  await page.goto("/plan"); // a new page load resets the tone counter
+  await page.getByRole("button", { name: "Mark Free throws not done" }).click();
+  await expect(page.getByText("Marked not done")).toBeVisible();
+  await page.waitForTimeout(300);
+  expect(await tones()).toBe(0);
+  expect(errors).toEqual([]);
+});

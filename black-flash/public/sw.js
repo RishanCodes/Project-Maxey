@@ -1,5 +1,5 @@
 /* BLACK FLASH service worker: offline app shell. Never caches API traffic (AI payloads) or non-GET requests. */
-const VERSION = "bf-v2";
+const VERSION = "bf-v3";
 const SHELL = ["/", "/plan", "/coach", "/growth", "/training", "/wellness", "/goals", "/focus", "/journal", "/settings", "/data", "/onboarding", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon.svg"];
 
 self.addEventListener("install", (e) => {

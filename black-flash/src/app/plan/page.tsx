@@ -1,4 +1,5 @@
 "use client";
+import { play } from "@/lib/sound";
 import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -77,8 +78,8 @@ function DayView({ prefs, snap, date, today, setDate }: Data & { date: string; t
   const unscheduled = snap.tasks.filter((t) => !t.archived && t.repeat.type === "none" && !t.dueDate && !snap.taskCompletions.some((c) => c.taskId === t.id));
   const future = date > today;
   async function toggle(o: TaskOccurrence) {
-    if (o.done) { await uncompleteTask(o.task.id, o.date); toast("Marked not done"); return; }
-    const xp = await completeTask(o.task.id, o.date); toast(`Done: ${o.task.title}${xp ? ` (+${xp} XP)` : ""}`, () => uncompleteTask(o.task.id, o.date));
+    if (o.done) { await uncompleteTask(o.task.id, o.date); play("undo"); toast("Marked not done"); return; }
+    const xp = await completeTask(o.task.id, o.date); play("complete"); toast(`Done: ${o.task.title}${xp ? ` (+${xp} XP)` : ""}`, () => uncompleteTask(o.task.id, o.date));
   }
   return (
     <div className="flex flex-col gap-5">
@@ -114,10 +115,10 @@ function DayView({ prefs, snap, date, today, setDate }: Data & { date: string; t
           return (
             <li key={h.id} className="flex items-center rounded-2xl border border-line/70 bg-graphite/60">
               <button aria-label={c?.state === "done" ? `Uncheck ${h.label}` : `Complete ${h.label}`} aria-pressed={c?.state === "done"} disabled={future} className="flex size-14 shrink-0 items-center justify-center disabled:opacity-40"
-                onClick={async () => { if (c) { await unmarkHabit(h.id, date); toast("Cleared"); } else { const xp = await markHabit(h.id, date, "done"); toast(`${h.label}${xp ? ` (+${xp} XP)` : ""}`, () => unmarkHabit(h.id, date)); } }}>
+                onClick={async () => { if (c) { await unmarkHabit(h.id, date); play("undo"); toast("Cleared"); } else { const xp = await markHabit(h.id, date, "done"); play("habit"); toast(`${h.label}${xp ? ` (+${xp} XP)` : ""}`, () => unmarkHabit(h.id, date)); } }}>
                 {c?.state === "done" ? <CircleCheck size={24} className="text-flash" /> : c?.state === "rest" ? <Moon size={22} className="text-done" /> : <Circle size={24} className="text-muted" />}</button>
               <button className="min-w-0 flex-1 py-3 text-left" onClick={() => setEditHabit(h)}><span className="block font-medium">{h.label}</span><span className="block text-sm text-muted">{c?.state === "rest" ? "Rest day (neutral)" : describeSchedule(h)}</span></button>
-              {!c && !future && <Button size="sm" variant="ghost" className="mr-2" onClick={async () => { await markHabit(h.id, date, "rest"); toast("Marked as a rest day. It won't count as missed.", () => unmarkHabit(h.id, date)); }}>Rest</Button>}
+              {!c && !future && <Button size="sm" variant="ghost" className="mr-2" onClick={async () => { await markHabit(h.id, date, "rest"); play("save"); toast("Marked as a rest day. It won't count as missed.", () => unmarkHabit(h.id, date)); }}>Rest</Button>}
             </li>);
         })}</ul></section>
       )}
@@ -125,7 +126,7 @@ function DayView({ prefs, snap, date, today, setDate }: Data & { date: string; t
         <li key={s.id} className="rounded-2xl border border-line/70 bg-graphite/60 px-4 py-3"><b className="block">{activityName(s)}</b><span className="text-sm text-muted">{[formatTime(s.startTime), `${s.durationMin} min`, s.status].filter(Boolean).join(" · ")}</span></li>))}</ul></section>}
       {unscheduled.length > 0 && date === today && <section aria-label="Anytime"><h2 className="mb-2 text-lg font-semibold">Anytime <span className="text-sm font-normal text-muted">(no date)</span></h2><ul className="flex flex-col gap-2">{unscheduled.map((t) => (
         <li key={t.id} className="flex items-center rounded-2xl border border-line/70 bg-graphite/60">
-          <button aria-label={`Complete ${t.title}`} className="flex size-14 shrink-0 items-center justify-center" onClick={async () => { const xp = await completeTask(t.id, today); toast(`Done: ${t.title}${xp ? ` (+${xp} XP)` : ""}`, () => uncompleteTask(t.id, today)); }}><Circle size={24} className="text-muted" /></button>
+          <button aria-label={`Complete ${t.title}`} className="flex size-14 shrink-0 items-center justify-center" onClick={async () => { const xp = await completeTask(t.id, today); play("complete"); toast(`Done: ${t.title}${xp ? ` (+${xp} XP)` : ""}`, () => uncompleteTask(t.id, today)); }}><Circle size={24} className="text-muted" /></button>
           <button className="min-w-0 flex-1 py-3 text-left font-medium" onClick={() => setEdit(t)}>{t.title}</button></li>))}</ul></section>}
       <TaskForm open={adding || !!edit} onOpenChange={(o) => { if (!o) { setAdding(false); setEdit(undefined); } }} task={edit} defaultDate={date} />
       <HabitForm open={!!editHabit} onOpenChange={(o) => !o && setEditHabit(undefined)} habit={editHabit} />
@@ -209,7 +210,7 @@ function RoutinesView({ today }: { today: string }) {
             <div className="mb-2 flex items-center justify-between"><button className="text-left" onClick={() => setEdit(r)}><b>{r.name}</b><span className="block text-xs text-muted">Today · {done}/{r.steps.length} steps</span></button></div>
             <ol className="flex flex-col">{r.steps.map((s, i) => {
               const on = comps.some((c) => c.routineId === r.id && c.stepId === s.id);
-              return <li key={s.id}><button aria-pressed={on} onClick={() => toggleRoutineStep(r.id, s.id, today)} className="flex min-h-12 w-full items-center gap-3 text-left">
+              return <li key={s.id}><button aria-pressed={on} onClick={async () => { const nowOn = await toggleRoutineStep(r.id, s.id, today); play(!nowOn ? "undo" : done + 1 === r.steps.length ? "complete" : "tick"); }} className="flex min-h-12 w-full items-center gap-3 text-left">
                 {on ? <CircleCheck size={22} className="text-flash" /> : <Circle size={22} className="text-muted" />}<span className={cx(on && "text-muted line-through")}><span className="tnum mr-2 text-muted">{i + 1}.</span>{s.label}</span></button></li>;
             })}</ol>
           </Card>);

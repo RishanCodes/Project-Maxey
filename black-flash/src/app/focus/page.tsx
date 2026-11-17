@@ -1,4 +1,5 @@
 "use client";
+import { play } from "@/lib/sound";
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -35,7 +36,7 @@ function FocusInner() {
   useEffect(() => {
     if (!timer || timer.pausedAtMs !== null) return;
     if (timerElapsedMs(timer, now) >= timer.plannedMin * 60_000) {
-      completeTimerIfDone(now).then((r) => { if (r.recorded) toast(`Focus session complete${r.xp ? ` (+${r.xp} XP)` : ""}. Take a ${prefs?.breakMinutes ?? 5}-minute break.`); });
+      completeTimerIfDone(now).then((r) => { if (r.recorded) { play("focus"); toast(`Focus session complete${r.xp ? ` (+${r.xp} XP)` : ""}. Take a ${prefs?.breakMinutes ?? 5}-minute break.`); } });
     }
   }, [timer, now, toast, prefs?.breakMinutes]);
 

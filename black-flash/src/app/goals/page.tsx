@@ -1,4 +1,5 @@
 "use client";
+import { play } from "@/lib/sound";
 import { useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Check, Circle, CircleCheck, Plus, Target, Trash2 } from "lucide-react";
@@ -80,7 +81,7 @@ function GoalSheet({ goal, onClose }: { goal: Goal | "new" | null; onClose: () =
             <section><p className="mb-2 text-sm font-medium text-muted">Milestones {p && p.total > 0 && `· ${p.done}/${p.total}`}</p>
               <ul className="flex flex-col">{milestones.map((m) => (
                 <li key={m.id} className="flex items-center">
-                  <button aria-pressed={!!m.doneAt} aria-label={m.doneAt ? `Reopen ${m.title}` : `Complete ${m.title}`} className="flex size-12 items-center justify-center" onClick={async () => { const xp = await setMilestoneDone(m.id, !m.doneAt); if (!m.doneAt) toast(`Milestone reached${xp ? ` (+${xp} XP)` : ""}`, () => { setMilestoneDone(m.id, false); }); }}>
+                  <button aria-pressed={!!m.doneAt} aria-label={m.doneAt ? `Reopen ${m.title}` : `Complete ${m.title}`} className="flex size-12 items-center justify-center" onClick={async () => { const xp = await setMilestoneDone(m.id, !m.doneAt); play(m.doneAt ? "undo" : "milestone"); if (!m.doneAt) toast(`Milestone reached${xp ? ` (+${xp} XP)` : ""}`, () => { setMilestoneDone(m.id, false); }); }}>
                     {m.doneAt ? <CircleCheck size={22} className="pop text-flash" /> : <Circle size={22} className="text-muted" />}</button>
                   <span className={cx("flex-1", m.doneAt && "text-muted line-through")}>{m.title}</span>
                   <IconButton label={`Delete ${m.title}`} onClick={() => deleteMilestone(m.id)}><Trash2 size={16} /></IconButton>
