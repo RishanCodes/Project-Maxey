@@ -12,7 +12,7 @@ export async function applyAnswerPreferences(a: Answers): Promise<Preferences> {
   return updatePrefs({
     name: typeof a.name === "string" ? a.name.trim().slice(0, 60) : cur.name,
     coachStyle: pick(a.coachStyle, ["direct", "balanced", "encouraging", "analytical"] as const, cur.coachStyle),
-    homeCard: pick(a.homeCard, ["priority", "workout", "study", "habit"] as const, cur.homeCard),
+    homeCard: pick(a.homeCard, ["priority", "workout", "study", "habit", "goal"] as const, cur.homeCard),
     gamification: pick(a.gamification, ["subtle", "balanced", "deep"] as const, cur.gamification),
     weeklyReview: a.weeklyReview === undefined ? cur.weeklyReview : a.weeklyReview === "yes",
     notifications: a.reminderStyle === "notify",

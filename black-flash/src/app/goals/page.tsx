@@ -6,7 +6,7 @@ import { Button, Chip, ConfirmSheet, EmptyState, Field, IconButton, Input, Progr
 import { useToast } from "@/components/toast";
 import { usePrefs, useSnapshot, useToday } from "@/hooks/use-data";
 import { getDb } from "@/lib/db";
-import { addMilestone, deleteGoal, deleteMilestone, saveGoal, setMilestoneDone } from "@/lib/repo";
+import { addMilestone, deleteGoal, deleteMilestone, saveGoal, setMilestoneDone, updatePrefs } from "@/lib/repo";
 import { daysBetween, formatDateKey } from "@/lib/dates";
 import { goalProgress } from "@/lib/stats";
 import { describeSchedule } from "@/lib/recurrence";
@@ -68,6 +68,7 @@ function GoalSheet({ goal, onClose }: { goal: Goal | "new" | null; onClose: () =
       <Sheet open={!!goal} onOpenChange={(o) => !o && onClose()} title={isNew ? "New goal" : "Goal"} footer={<>
         {g && <Button variant="danger" onClick={() => setConfirm(true)}>Delete</Button>}
         {g && cur?.status === "active" && <Button onClick={async () => { await saveGoal({ ...cur, status: "done" }); toast("Goal marked complete. Well earned."); onClose(); }}>Complete</Button>}
+        {g && cur?.status === "active" && <Button variant="ghost" onClick={async () => { await updatePrefs({ homeCard: "goal", focusGoalId: g.id }); toast("Pinned as Today's focus"); }}>Pin to Today</Button>}
         {g && cur?.status !== "active" && <Button onClick={async () => { await saveGoal({ ...cur!, status: "active" }); toast("Goal reopened"); }}>Reopen</Button>}
         <Button variant="primary" className="flex-1" onClick={() => save()}>Save</Button></>}>
         <div className="flex flex-col gap-4">

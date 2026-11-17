@@ -263,3 +263,50 @@ test("12. keyboard, dialogs and reduced motion", async ({ page }) => {
   const dur = await page.evaluate(() => { const el = document.createElement("div"); el.className = "sheet-in"; document.body.appendChild(el); return getComputedStyle(el).animationDuration; });
   expect(parseFloat(dur)).toBeLessThan(0.01);
 });
+
+test("13. suggest times proposes free slots and only changes tasks after approval", async ({ page }) => {
+  await page.clock.setFixedTime(MON); // Monday 11:00 Los Angeles
+  await startWithDefaults(page);
+  await page.goto("/plan");
+  await page.getByRole("tab", { name: /Tue/ }).click();
+  for (const t of ["Essay outline", "Call grandma"]) {
+    await page.getByRole("button", { name: "Add", exact: true }).click();
+    await page.getByLabel("Title").fill(t);
+    await page.getByRole("button", { name: "Add task" }).click();
+    await expect(page.getByText("Task added")).toBeVisible();
+  }
+  await page.getByRole("button", { name: "Suggest times" }).click();
+  const sheet = page.getByRole("dialog", { name: "Suggested times" });
+  await expect(sheet.getByRole("button", { name: /Essay outline/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Essay outline.*AM|Essay outline.*PM/ })).toHaveCount(0); // nothing changed yet
+  await sheet.getByRole("button", { name: /Call grandma/ }).click(); // untick one
+  await sheet.getByRole("button", { name: "Apply 1" }).click();
+  await expect(page.getByText("Scheduled 1 task")).toBeVisible();
+  await expect(page.getByRole("button", { name: /^Essay outline.*\d{1,2}:\d{2} (AM|PM)/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Call grandma", exact: true })).toBeVisible(); // still unscheduled
+});
+
+test("14. a goal can be pinned as Today's focus", async ({ page }) => {
+  await startWithDefaults(page);
+  await page.goto("/goals");
+  await page.getByRole("button", { name: "Create a goal" }).click();
+  await page.getByLabel("Goal", { exact: true }).fill("Make varsity");
+  await page.getByRole("button", { name: "Save" }).click();
+  await page.getByRole("button", { name: /Make varsity/ }).click();
+  await page.getByLabel("New milestone").fill("Hit 70% layups");
+  await page.getByRole("button", { name: "Add", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Complete Hit 70% layups" })).toBeVisible();
+  await page.getByRole("button", { name: "Pin to Today" }).click();
+  await expect(page.getByText("Pinned as Today's focus")).toBeVisible();
+  await page.goto("/");
+  await expect(page.getByText("Goal focus")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Make varsity" })).toBeVisible();
+  await expect(page.getByText(/Next: Hit 70% layups/)).toBeVisible();
+});
+
+test("15. without cloud configuration the app says so and stays fully local", async ({ page }) => {
+  await startWithDefaults(page);
+  await page.goto("/settings");
+  await expect(page.getByText(/Cloud sync isn't set up for this installation/)).toBeVisible();
+  await expect(page.getByText(/Push isn't set up for this installation/)).toBeVisible();
+});

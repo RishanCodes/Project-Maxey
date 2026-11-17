@@ -1,4 +1,5 @@
 import Dexie, { type EntityTable } from "dexie";
+import { installChangeCapture, type OutboxEntry, type SyncMetaEntry } from "./sync/capture";
 import type {
   AchievementUnlock, CoachMessage, DailyCheckin, FocusSession, Goal, Habit, HabitCompletion, JournalEntry, KvEntry,
   MealEntry, Milestone, OnboardingAnswer, Preferences, Routine, RoutineStepCompletion, Task, TaskCompletion, TrainingSession, XpEvent,
@@ -29,6 +30,8 @@ export class BlackFlashDB extends Dexie {
   achievements!: EntityTable<AchievementUnlock, "id">;
   coach!: EntityTable<CoachMessage, "id">;
   kv!: EntityTable<KvEntry, "key">;
+  outbox!: EntityTable<OutboxEntry, "key">;
+  syncMeta!: EntityTable<SyncMetaEntry, "key">;
 
   constructor(name = "black-flash") {
     super(name);
@@ -53,6 +56,12 @@ export class BlackFlashDB extends Dexie {
       coach: "id, at",
       kv: "key",
     });
+    // v2: change capture for optional cloud sync. Existing data is untouched.
+    this.version(2).stores({
+      outbox: "key, changedAt",
+      syncMeta: "key",
+    });
+    installChangeCapture(this);
   }
 }
 

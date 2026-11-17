@@ -22,11 +22,11 @@ Never diagnose injuries, illnesses or mental health, never guess hidden feelings
 If you suggest creating a task or habit, ALSO add at the very end a fenced code block with language "proposals" containing JSON like {"proposals":[{"type":"create_task","title":"...","dueDate":"YYYY-MM-DD"},{"type":"create_habit","label":"...","perWeek":3}]}. The app shows each proposal for the user to confirm; you cannot change anything yourself.`;
 
 export async function GET(req: Request) {
-  return Response.json(coachStatus(req.headers.get("host")));
+  return Response.json(await coachStatus(req.headers.get("host")));
 }
 
 export async function POST(req: Request) {
-  const status = coachStatus(req.headers.get("host"));
+  const status = await coachStatus(req.headers.get("host"));
   if (!status.allowed) return Response.json({ error: status.reason }, { status: 403 });
   if (rateLimited()) return Response.json({ error: "Too many requests. Wait a minute and try again." }, { status: 429 });
   const raw = await req.text();

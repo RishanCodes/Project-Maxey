@@ -6,7 +6,7 @@ const config = [
   ...nextTs,
   // UI copy uses plain apostrophes and quotes on purpose.
   { rules: { "react/no-unescaped-entities": "off" } },
-  { ignores: [".next/**", "node_modules/**", "public/sw.js", "playwright-report/**", "test-results/**", "next-env.d.ts"] },
+  { ignores: [".next/**", ".next-cloud/**", "node_modules/**", "public/sw.js", "playwright-report/**", "test-results/**", "next-env.d.ts"] },
 ];
 
 export default config;

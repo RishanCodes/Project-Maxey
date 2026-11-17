@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { BookOpen, ChevronRight, Circle, CircleCheck, Dumbbell, Info, Repeat, Sparkles } from "lucide-react";
+import { BookOpen, ChevronRight, Circle, CircleCheck, Dumbbell, Info, Repeat, Sparkles, Target } from "lucide-react";
 import { Button, Card, EmptyState, Eyebrow, ProgressBar, Skeleton, cx } from "@/components/ui";
 import { useToast } from "@/components/toast";
 import { TaskForm } from "@/components/forms/task-form";
@@ -11,7 +11,7 @@ import { TrainingForm } from "@/components/forms/training-form";
 import { useCreatedDate, usePrefs, useSnapshot, useToday } from "@/hooks/use-data";
 import { completeTask, markHabit, uncompleteTask, unmarkHabit, activityName } from "@/lib/repo";
 import { formatDateKey, formatTime, greeting } from "@/lib/dates";
-import { todayPlan } from "@/lib/stats";
+import { goalProgress, todayPlan } from "@/lib/stats";
 import { buildInsights } from "@/lib/insights";
 import { MAX_TODAY_PRIORITIES } from "@/lib/config";
 import type { Habit, Task, TrainingSession } from "@/lib/schema";
@@ -47,6 +47,14 @@ export default function TodayPage() {
     if (card === "workout" && nextTraining) return { label: "Next workout", title: activityName(nextTraining), meta: [nextTraining.date === today ? "Today" : formatDateKey(nextTraining.date), formatTime(nextTraining.startTime), `${nextTraining.durationMin} min`].filter(Boolean).join(" · "), cta: nextTraining.date === today ? "Log it" : "Open", act: () => setLogSession(nextTraining), icon: Dumbbell };
     if (card === "study" && studyTask) return { label: "Study focus", title: studyTask.task.title, meta: [studyTask.task.dueTime && formatTime(studyTask.task.dueTime), studyTask.task.durationMin && `${studyTask.task.durationMin} min`].filter(Boolean).join(" · ") || "Today", cta: "Start focus", act: () => router.push(`/focus?task=${studyTask.task.id}`), icon: BookOpen, taskId: studyTask.task.id };
     if (card === "habit" && openHabits.length) return { label: "Habits due", title: openHabits[0].label, meta: `${openHabits.length} habit${openHabits.length > 1 ? "s" : ""} left today`, cta: "Check off", act: () => toggleHabit(openHabits[0], false), icon: Repeat, habitId: openHabits[0].id };
+    if (card === "goal") {
+      const goal = snap.goals.find((g) => g.id === prefs.focusGoalId && g.status === "active") ?? snap.goals.find((g) => g.status === "active");
+      if (goal) {
+        const p = goalProgress(goal, snap.milestones);
+        const next = snap.milestones.filter((m) => m.goalId === goal.id && !m.doneAt).sort((a, b) => a.order - b.order)[0];
+        return { label: "Goal focus", title: goal.title, meta: [next ? `Next: ${next.title}` : p.total ? "All milestones done" : "Add milestones to track progress", goal.deadline && `by ${formatDateKey(goal.deadline)}`].filter(Boolean).join(" · "), cta: "Open goal", act: () => router.push("/goals"), icon: Target };
+      }
+    }
     if (card === "priority" && openTasks[0]) { const o = openTasks[0]; return { label: o.overdue ? "Overdue priority" : "Top priority", title: o.task.title, meta: [o.task.dueTime && formatTime(o.task.dueTime), o.task.durationMin && `${o.task.durationMin} min`, `${o.task.priority} priority`].filter(Boolean).join(" · "), cta: "Mark done", act: () => toggleTask(o), icon: CircleCheck, taskId: o.task.id }; }
     return null;
   };
@@ -68,7 +76,7 @@ export default function TodayPage() {
     toast(`${h.label}${xp ? ` (+${xp} XP)` : ""}`, () => unmarkHabit(h.id, today));
   }
 
-  const nothingYet = snap.tasks.length === 0 && snap.habits.length === 0 && snap.training.length === 0;
+  const nothingYet = snap.tasks.length === 0 && snap.habits.length === 0 && snap.training.length === 0 && !snap.goals.some((g) => g.status === "active");
   const nextEvent = nextTraining ? `${activityName(nextTraining)} ${nextTraining.date === today ? formatTime(nextTraining.startTime) || "today" : formatDateKey(nextTraining.date)}` : null;
 
   return (

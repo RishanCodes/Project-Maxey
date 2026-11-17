@@ -1,4 +1,5 @@
 import { getDb, ALL_TABLES } from "./db";
+import { SYNC_TABLES, changeClock, outboxKey } from "./sync/capture";
 import { BackupFile, SCHEMA_VERSION, type BackupData } from "./schema";
 
 export async function exportBackup(): Promise<BackupFile> {
@@ -35,7 +36,15 @@ export async function importBackup(file: BackupFile, mode: "replace" | "merge"):
   const db = getDb();
   let added = 0, skipped = 0;
   await db.transaction("rw", db.tables, async () => {
-    if (mode === "replace") for (const t of db.tables) await t.clear();
+    if (mode === "replace") {
+      // Records that exist now but not in the backup must also be deleted from the cloud copy.
+      const incoming = new Set<string>();
+      for (const t of SYNC_TABLES) for (const r of file.data[t] as Array<{ id: string }>) incoming.add(outboxKey(t, String(r.id)));
+      const gone: string[][] = [];
+      for (const t of SYNC_TABLES) for (const id of (await db.table(t).toCollection().primaryKeys()) as string[]) if (!incoming.has(outboxKey(t, String(id)))) gone.push([t, String(id)]);
+      for (const t of db.tables) if (t.name !== "syncMeta" && t.name !== "outbox") await t.clear();
+      await db.outbox.bulkPut(gone.map(([t, id]) => ({ key: outboxKey(t, id), tbl: t as (typeof SYNC_TABLES)[number], id, changedAt: changeClock() })));
+    }
     for (const t of ALL_TABLES) {
       const rows = file.data[t] as Array<Record<string, unknown>>;
       const table = db.table(t);

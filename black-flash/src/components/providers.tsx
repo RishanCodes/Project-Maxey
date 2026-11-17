@@ -6,6 +6,7 @@ import { FlashMark } from "./logo";
 import { getPrefs } from "@/lib/repo";
 import { usePrefs } from "@/hooks/use-data";
 import { HabitReminders } from "./reminders";
+import { SyncProvider } from "./sync";
 
 function Splash({ message }: { message?: string }) {
   return (
@@ -50,7 +51,7 @@ export function Providers({ children }: { children: ReactNode }) {
     <ToastProvider>
       <ServiceWorker />
       <HabitReminders />
-      <BootGate>{children}</BootGate>
+      <BootGate><SyncProvider>{children}</SyncProvider></BootGate>
     </ToastProvider>
   );
 }

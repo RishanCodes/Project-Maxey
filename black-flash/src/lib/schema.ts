@@ -12,7 +12,7 @@ export const SCHEMA_VERSION = 1;
 
 export const DateKey = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use a YYYY-MM-DD date");
 export const TimeKey = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use a HH:MM time");
-const Id = z.string().min(1).max(64);
+const Id = z.string().min(1).max(200);
 const Iso = z.string().min(10);
 const Stamps = { createdAt: Iso, updatedAt: Iso };
 const Weekdays = z.array(z.number().int().min(0).max(6)).max(7);
@@ -41,7 +41,9 @@ export const Preferences = z.object({
   appName: z.string().min(1).max(40),
   timezone: z.string().min(1).max(64),
   weekStart: z.union([z.literal(0), z.literal(1)]),
-  homeCard: z.enum(["priority", "workout", "study", "habit"]),
+  homeCard: z.enum(["priority", "workout", "study", "habit", "goal"]),
+  /** Goal pinned as Today's focus (when homeCard is "goal"). */
+  focusGoalId: Id.optional(),
   gamification: z.enum(["subtle", "balanced", "deep"]),
   coachStyle: z.enum(["direct", "balanced", "encouraging", "analytical"]),
   weeklyReview: z.boolean(),

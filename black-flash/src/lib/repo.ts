@@ -12,6 +12,7 @@ import {
   type HabitCompletion, type XpEvent,
 } from "./schema";
 import { ACHIEVEMENTS } from "./achievements";
+import { SYNC_TABLES, changeClock, outboxKey, type OutboxEntry } from "./sync/capture";
 
 export const newId = (): string =>
   typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `id-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
@@ -63,6 +64,14 @@ async function isAwardActive(key: string): Promise<boolean> {
   return events.filter((e) => e.kind === "award").length > events.filter((e) => e.kind === "reversal").length;
 }
 
+/**
+ * Deterministic XP event ids ("xp:<key>#<n>"): the same action on two devices creates the same
+ * event id, so syncing merges them instead of awarding twice.
+ */
+async function xpEventId(key: string): Promise<string> {
+  return `xp:${key}#${await db().xp.where("key").equals(key).count()}`;
+}
+
 /** Awards XP once per key. Respects the daily cap. Returns the amount actually awarded (may be 0). */
 export async function awardXp(sourceType: Source, sourceId: string, label: string, actionDate?: DateKey): Promise<number> {
   const key = `${sourceType}:${sourceId}`;
@@ -71,7 +80,7 @@ export async function awardXp(sourceType: Source, sourceId: string, label: strin
   const dayEvents = await db().xp.where("date").equals(date).toArray();
   const usedToday = dayEvents.reduce((s, e) => s + e.amount, 0);
   const amount = Math.max(0, Math.min(XP[sourceType], XP.dailyCap - usedToday));
-  await db().xp.add({ id: newId(), key, sourceType, sourceId, kind: "award", amount, date, at: nowIso(), label });
+  await db().xp.add({ id: await xpEventId(key), key, sourceType, sourceId, kind: "award", amount, date, at: nowIso(), label });
   return amount;
 }
 
@@ -81,7 +90,7 @@ export async function reverseXp(sourceType: Source, sourceId: string): Promise<n
   if (!(await isAwardActive(key))) return 0;
   const events = (await db().xp.where("key").equals(key).toArray()).sort((a, b) => a.at.localeCompare(b.at));
   const lastAward = [...events].reverse().find((e) => e.kind === "award")!;
-  await db().xp.add({ id: newId(), key, sourceType, sourceId, kind: "reversal", amount: -lastAward.amount, date: lastAward.date, at: nowIso(), label: `Undone: ${lastAward.label}` });
+  await db().xp.add({ id: await xpEventId(key), key, sourceType, sourceId, kind: "reversal", amount: -lastAward.amount, date: lastAward.date, at: nowIso(), label: `Undone: ${lastAward.label}` });
   return lastAward.amount;
 }
 
@@ -158,7 +167,7 @@ export async function completeTask(taskId: string, date: DateKey): Promise<numbe
     const occ = occurrenceKey(task, date);
     const exists = await db().taskCompletions.where("[taskId+date]").equals([taskId, occ]).first();
     if (exists) return 0;
-    await db().taskCompletions.add({ id: newId(), taskId, date: occ, completedAt: nowIso() });
+    await db().taskCompletions.add({ id: `tc:${taskId}:${occ}`, taskId, date: occ, completedAt: nowIso() });
     const got = await awardXp("task", `${taskId}:${occ}`, `Task: ${task.title}`);
     await evaluateAchievements();
     return got;
@@ -237,7 +246,7 @@ export async function markHabit(habitId: string, date: DateKey, state: HabitComp
     const existing = await d.habitCompletions.where("[habitId+date]").equals([habitId, date]).first();
     if (existing?.state === state) return 0;
     if (existing) { await d.habitCompletions.delete(existing.id); await reverseXp("habit", `${habitId}:${date}`); }
-    await d.habitCompletions.add({ id: newId(), habitId, date, state, at: nowIso() });
+    await d.habitCompletions.add({ id: `hc:${habitId}:${date}`, habitId, date, state, at: nowIso() });
     let got = 0;
     if (state === "done") got = await awardXp("habit", `${habitId}:${date}`, `Habit: ${habit.label}`);
     await evaluateAchievements();
@@ -269,7 +278,7 @@ export async function deleteRoutine(id: string) {
 export async function toggleRoutineStep(routineId: string, stepId: string, date: DateKey): Promise<boolean> {
   const ex = await db().routineCompletions.where("[routineId+stepId+date]").equals([routineId, stepId, date]).first();
   if (ex) { await db().routineCompletions.delete(ex.id); return false; }
-  await db().routineCompletions.add({ id: newId(), routineId, stepId, date, at: nowIso() });
+  await db().routineCompletions.add({ id: `rc:${routineId}:${stepId}:${date}`, routineId, stepId, date, at: nowIso() });
   return true;
 }
 
@@ -447,7 +456,22 @@ export async function getAnswers(): Promise<Record<string, unknown>> {
 }
 
 /* ---------------- danger zone ---------------- */
-export async function deleteAllData() {
+/**
+ * scope "everywhere": also deletes the cloud copy on the next sync (records a deletion for every record).
+ * scope "device": erases only this device and forgets sync state; the cloud copy is untouched (sign out first).
+ */
+export async function deleteAllData(scope: "everywhere" | "device" = "everywhere") {
   const d = db();
-  await withTx(async () => { for (const t of d.tables) await t.clear(); });
+  await withTx(async () => {
+    const tombstones: OutboxEntry[] = [];
+    if (scope === "everywhere") {
+      for (const tbl of SYNC_TABLES) for (const id of (await d.table(tbl).toCollection().primaryKeys()) as string[]) tombstones.push({ key: outboxKey(tbl, String(id)), tbl, id: String(id), changedAt: changeClock() });
+    }
+    const keepSync = scope === "everywhere";
+    for (const t of d.tables) {
+      if (keepSync && t.name === "syncMeta") continue;
+      await t.clear();
+    }
+    if (tombstones.length) await d.outbox.bulkPut(tombstones);
+  });
 }

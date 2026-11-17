@@ -8,6 +8,7 @@ import { useToast } from "@/components/toast";
 import { TaskForm } from "@/components/forms/task-form";
 import { HabitForm } from "@/components/forms/habit-form";
 import { RoutineForm } from "@/components/plan/routine-form";
+import { SuggestSheet } from "@/components/plan/suggest-sheet";
 import { useCreatedDate, usePrefs, useSnapshot, useToday } from "@/hooks/use-data";
 import { getDb } from "@/lib/db";
 import { completeTask, markHabit, moveTask, toggleRoutineStep, uncompleteTask, unmarkHabit, activityName } from "@/lib/repo";
@@ -67,6 +68,8 @@ function DayView({ prefs, snap, date, today, setDate }: Data & { date: string; t
   const toast = useToast();
   const [q, setQ] = useState(""); const [prio, setPrio] = useState<"all" | Task["priority"]>("all"); const [showDone, setShowDone] = useState(true);
   const [edit, setEdit] = useState<Task | undefined>(); const [adding, setAdding] = useState(false); const [editHabit, setEditHabit] = useState<Habit | undefined>();
+  const [suggest, setSuggest] = useState(false);
+  const { minutes: nowMin } = useToday(prefs.timezone);
   const occ = useMemo(() => sortOccurrences(occurrencesOn(snap.tasks, snap.taskCompletions, date, today, created)), [snap, date, today, created]);
   const filtered = occ.filter((o) => (showDone || !o.done) && (prio === "all" || o.task.priority === prio) && (!q.trim() || `${o.task.title} ${o.task.tags.join(" ")} ${o.task.description}`.toLowerCase().includes(q.trim().toLowerCase())));
   const habits = snap.habits.filter((h) => h.status === "active" && (isDueToday(h, date, snap.habitCompletions, prefs.weekStart) || snap.habitCompletions.some((c) => c.habitId === h.id && c.date === date)));
@@ -86,7 +89,9 @@ function DayView({ prefs, snap, date, today, setDate }: Data & { date: string; t
           <label className="ml-auto flex min-h-10 items-center gap-2 text-sm text-muted"><input type="checkbox" checked={showDone} onChange={(e) => setShowDone(e.target.checked)} className="size-4 accent-[#17BCE4]" />Show completed</label></div>
       </div>
       <section aria-label="Tasks">
-        <div className="mb-2 flex items-center justify-between"><h2 className="text-lg font-semibold">Tasks</h2><Button size="sm" onClick={() => setAdding(true)}><Plus size={16} />Add</Button></div>
+        <div className="mb-2 flex items-center justify-between gap-2"><h2 className="text-lg font-semibold">Tasks</h2><div className="flex gap-2">
+          {date >= today && occ.some((o) => !o.done && !o.task.dueTime && o.task.repeat.type === "none") && <Button size="sm" variant="ghost" onClick={() => setSuggest(true)}>Suggest times</Button>}
+          <Button size="sm" onClick={() => setAdding(true)}><Plus size={16} />Add</Button></div></div>
         {filtered.length === 0 ? <p className="rounded-2xl border border-dashed border-line px-4 py-6 text-center text-sm text-muted">{occ.length ? "No tasks match these filters." : "No tasks on this day."}</p> : (
           <ul className="flex flex-col gap-2">{filtered.map((o, i) => (
             <li key={o.task.id} className="flex items-center rounded-2xl border border-line/70 bg-graphite/60">
@@ -124,6 +129,7 @@ function DayView({ prefs, snap, date, today, setDate }: Data & { date: string; t
           <button className="min-w-0 flex-1 py-3 text-left font-medium" onClick={() => setEdit(t)}>{t.title}</button></li>))}</ul></section>}
       <TaskForm open={adding || !!edit} onOpenChange={(o) => { if (!o) { setAdding(false); setEdit(undefined); } }} task={edit} defaultDate={date} />
       <HabitForm open={!!editHabit} onOpenChange={(o) => !o && setEditHabit(undefined)} habit={editHabit} />
+      <SuggestSheet open={suggest} onOpenChange={setSuggest} date={date} today={today} nowMin={nowMin} occurrences={occ} training={snap.training} />
     </div>
   );
 }

@@ -6,10 +6,14 @@ import { Button, Card, ConfirmSheet, Field, Input, Segmented, SectionHeader } fr
 import { useToast } from "@/components/toast";
 import { exportBackup, importBackup, parseBackup, type ParseResult } from "@/lib/backup";
 import { deleteAllData, getPrefs } from "@/lib/repo";
+import { useSync } from "@/components/sync";
+import { signOutCloud } from "@/lib/cloud/client";
 
 export default function DataPage() {
   const toast = useToast();
   const router = useRouter();
+  const sync = useSync();
+  const [scope, setScope] = useState<"everywhere" | "device">("device");
   const fileRef = useRef<HTMLInputElement>(null);
   const [parsed, setParsed] = useState<ParseResult | null>(null); const [mode, setMode] = useState<"merge" | "replace">("merge");
   const [confirmImport, setConfirmImport] = useState(false); const [confirmDelete, setConfirmDelete] = useState(false); const [typed, setTyped] = useState("");
@@ -51,13 +55,18 @@ export default function DataPage() {
       <Card className="flex flex-col gap-3 border-red/30"><SectionHeader title="Delete all data" />
         <p className="text-sm text-muted">Permanently erases everything stored by this app on this device. Export first if you might want it back.</p>
         <Field label='Type "delete" to enable' htmlFor="d-type"><Input id="d-type" value={typed} onChange={(e) => setTyped(e.target.value)} autoComplete="off" /></Field>
+        {sync.user && <Segmented label="What to delete" value={scope} onChange={setScope} options={[{ value: "device", label: "This device only" }, { value: "everywhere", label: "Everywhere" }]} />}
+        {sync.user && <p className="text-xs text-muted">{scope === "device" ? "Signs you out and erases this device. Your cloud copy stays and comes back when you sign in again." : "Erases this device and your cloud copy, on every device that syncs."}</p>}
         <Button variant="danger" className="self-start" disabled={typed.trim().toLowerCase() !== "delete"} onClick={() => setConfirmDelete(true)}>Delete all data</Button>
       </Card>
       <ConfirmSheet open={confirmImport} onOpenChange={setConfirmImport} danger={mode === "replace"} title={mode === "replace" ? "Replace all data?" : "Merge this backup?"}
         body={mode === "replace" ? "Everything currently on this device is deleted and replaced by the backup. This can't be undone." : "New records from the backup are added. Existing records are kept unchanged."} confirmLabel={mode === "replace" ? "Replace" : "Merge"}
         onConfirm={async () => { if (!parsed?.ok) return; const r = await importBackup(parsed.file, mode); await getPrefs(); setParsed(null); toast(`Import done: ${r.added} added${r.skipped ? `, ${r.skipped} already here` : ""}`); }} />
-      <ConfirmSheet open={confirmDelete} onOpenChange={setConfirmDelete} danger title="Delete everything?" body="All tasks, habits, training, check-ins, journal entries, goals and XP on this device are erased." confirmLabel="Delete everything"
-        onConfirm={async () => { await deleteAllData(); await getPrefs(); setTyped(""); toast("All data deleted"); router.replace("/onboarding"); }} />
+      <ConfirmSheet open={confirmDelete} onOpenChange={setConfirmDelete} danger title="Delete everything?" body={sync.user && scope === "everywhere" ? "All tasks, habits, training, check-ins, journal entries, goals and XP are erased here and in your cloud copy." : "All tasks, habits, training, check-ins, journal entries, goals and XP on this device are erased."} confirmLabel="Delete everything"
+        onConfirm={async () => {
+          if (sync.user && scope === "everywhere") { await deleteAllData("everywhere"); await sync.syncNow(); }
+          else { if (sync.user) await signOutCloud(); await deleteAllData("device"); }
+          await getPrefs(); setTyped(""); toast("All data deleted"); router.replace("/onboarding"); }} />
     </div>
   );
 }

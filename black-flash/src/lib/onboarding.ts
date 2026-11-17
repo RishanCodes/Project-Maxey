@@ -109,7 +109,7 @@ export const QUESTIONS: Question[] = [
   { id: "homeworkTime", chapter: 4, type: "time", prompt: "What time usually works for studying?", optional: true, showIf: (a) => has(a, "areas", "academics") },
   // Chapter 5: App preferences
   { id: "homeCard", chapter: 5, type: "single", prompt: "What should the main card on Today show?", optional: true, options: [
-    { value: "priority", label: "Top priority task" }, { value: "workout", label: "Next workout" }, { value: "study", label: "Study / focus" }, { value: "habit", label: "Habits due" }] },
+    { value: "priority", label: "Top priority task" }, { value: "workout", label: "Next workout" }, { value: "study", label: "Study / focus" }, { value: "habit", label: "Habits due" }, { value: "goal", label: "A goal I choose" }] },
   { id: "gamification", chapter: 5, type: "single", prompt: "How visible should levels and XP be?", optional: true, options: [
     { value: "subtle", label: "Subtle" }, { value: "balanced", label: "Balanced" }, { value: "deep", label: "Front and center" }] },
   { id: "weeklyReview", chapter: 5, type: "single", prompt: "Would you like a weekly review?", optional: true, options: [{ value: "yes", label: "Yes" }, { value: "no", label: "No" }] },

@@ -9,6 +9,8 @@ import { updatePrefs } from "@/lib/repo";
 import { browserTimezone, isValidTimezone } from "@/lib/dates";
 import { CONTEXT_LABEL, type ContextKey } from "@/lib/coach-context";
 import type { Preferences } from "@/lib/schema";
+import { CloudCard } from "@/components/settings/cloud-card";
+import { PushCard } from "@/components/settings/push-card";
 
 const ZONES = ["America/Los_Angeles", "America/Denver", "America/Chicago", "America/New_York", "America/Toronto", "Europe/London", "Europe/Berlin", "Asia/Tokyo", "Australia/Sydney", "UTC"];
 
@@ -26,7 +28,7 @@ export default function SettingsPage() {
       <Card className="flex flex-col gap-4"><SectionHeader title="Preferences" />
         <Field label="Timezone" htmlFor="s-tz" hint={`Decides what "today" means. Detected on this device: ${browserTimezone()}`}><Select id="s-tz" value={prefs.timezone} onChange={(e) => isValidTimezone(e.target.value) && set({ timezone: e.target.value }, "Timezone updated")}>{zones.map((z) => <option key={z} value={z}>{z}</option>)}</Select></Field>
         <fieldset><legend className="mb-1.5 text-sm font-medium text-muted">Week starts on</legend><div className="flex gap-1.5"><Chip selected={prefs.weekStart === 1} onClick={() => set({ weekStart: 1 })}>Monday</Chip><Chip selected={prefs.weekStart === 0} onClick={() => set({ weekStart: 0 })}>Sunday</Chip></div></fieldset>
-        <fieldset><legend className="mb-1.5 text-sm font-medium text-muted">Main card on Today</legend><div className="flex flex-wrap gap-1.5">{([["priority", "Top priority"], ["workout", "Next workout"], ["study", "Study / focus"], ["habit", "Habits due"]] as const).map(([v, l]) => <Chip key={v} selected={prefs.homeCard === v} onClick={() => set({ homeCard: v })}>{l}</Chip>)}</div></fieldset>
+        <fieldset><legend className="mb-1.5 text-sm font-medium text-muted">Main card on Today</legend><div className="flex flex-wrap gap-1.5">{([["priority", "Top priority"], ["workout", "Next workout"], ["study", "Study / focus"], ["habit", "Habits due"], ["goal", "A goal"]] as const).map(([v, l]) => <Chip key={v} selected={prefs.homeCard === v} onClick={() => set({ homeCard: v })}>{l}</Chip>)}</div></fieldset>
         <fieldset><legend className="mb-1.5 text-sm font-medium text-muted">Levels and XP</legend><div className="flex flex-wrap gap-1.5">{(["subtle", "balanced", "deep"] as const).map((v) => <Chip key={v} selected={prefs.gamification === v} onClick={() => set({ gamification: v })} className="capitalize">{v}</Chip>)}</div></fieldset>
         <fieldset><legend className="mb-1.5 text-sm font-medium text-muted">Coaching tone</legend><div className="flex flex-wrap gap-1.5">{(["direct", "balanced", "encouraging", "analytical"] as const).map((v) => <Chip key={v} selected={prefs.coachStyle === v} onClick={() => set({ coachStyle: v })} className="capitalize">{v}</Chip>)}</div></fieldset>
         <div className="grid grid-cols-2 gap-3">
@@ -37,7 +39,7 @@ export default function SettingsPage() {
         <Switch checked={prefs.notifications} onChange={async (v) => {
           if (v && typeof Notification !== "undefined") { const p = await Notification.requestPermission(); if (p !== "granted") { toast("Notifications were not allowed by the browser."); return; } }
           set({ notifications: v });
-        }} label="Habit reminders" description="Best effort: shown only while the app is open, and only where the browser allows notifications." />
+        }} label="In-app habit reminders" description="Shown while the app is open. For reminders when it's closed, see below." />
       </Card>
       <Card className="flex flex-col gap-3"><SectionHeader title="Onboarding" sub={prefs.onboarding.status === "defaults" ? "Started with defaults" : prefs.onboarding.completedAt ? "Completed" : "Not completed"} />
         <p className="text-sm text-muted">Retake or edit your answers. Your data stays; approving the plan again updates the same items instead of duplicating them.</p>
@@ -49,9 +51,9 @@ export default function SettingsPage() {
         {(Object.keys(CONTEXT_LABEL) as ContextKey[]).map((k) => (
           <Switch key={k} checked={prefs.aiConsent[k]} onChange={(v) => set({ aiConsent: { ...prefs.aiConsent, [k]: v } }, v ? `${CONTEXT_LABEL[k]} may be shared` : `${CONTEXT_LABEL[k]} will not be shared`)} label={CONTEXT_LABEL[k]} description={k === "journal" ? "Private writing. Only enable if you're comfortable sending entries to the AI provider." : k === "wellness" ? "Sleep, energy, mood and soreness check-ins." : undefined} />))}
       </Card>
-      <Card className="flex flex-col gap-2"><SectionHeader title="Account & cloud" />
-        <p className="text-sm text-muted">Local First mode: everything is stored in this browser on this device. There is no account and no cloud sync in this version, so data doesn't move between devices. Use <Link href="/data" className="font-semibold text-flash">Data</Link> to export a backup.</p>
-      </Card>
+      <CloudCard />
+      <PushCard />
+      <p className="text-xs text-muted">Backups: <Link href="/data" className="font-semibold text-flash">Data</Link> exports everything to a file, with or without cloud sync.</p>
     </div>
   );
 }
