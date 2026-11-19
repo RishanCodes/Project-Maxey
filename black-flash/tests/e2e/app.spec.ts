@@ -346,3 +346,47 @@ test("16. sound effects play on completions and stay silent when turned off", as
   expect(await tones()).toBe(0);
   expect(errors).toEqual([]);
 });
+
+test("17. 90-day program: set up, baseline test, a training day, check-in makes it lighter, progress saved", async ({ page }) => {
+  await startWithDefaults(page);
+  await page.clock.setFixedTime(MON);
+  await page.goto("/program");
+  await page.getByRole("button", { name: "Start my 90 days" }).click();
+  await expect(page.locator("main [role=alert]")).toHaveText("Pick at least one skill to focus on.");
+  for (const n of ["Finishing", "Shooting"]) await page.getByRole("button", { name: n, exact: true }).click();
+  await page.getByRole("button", { name: "Start my 90 days" }).click();
+  await expect(page.getByRole("heading", { name: "Day 1 of 90" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Baseline test day" })).toBeVisible();
+  await page.getByLabel("Free throws (out of 20)").fill("11");
+  await page.getByRole("button", { name: /Finish session/ }).click();
+  await page.getByRole("button", { name: "About right" }).click();
+  await page.getByRole("button", { name: "Save session" }).click();
+  await expect(page.getByText(/Day 1 done \(\+15 XP\)/)).toBeVisible();
+  await expect(page.getByText("11 → –")).toBeVisible(); // baseline recorded
+
+  // Next day (Tuesday, a default training day).
+  await page.clock.setFixedTime(new Date(MON.getTime() + 86_400_000));
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Day 2 of 90" })).toBeVisible();
+  const full = Number((await page.getByText(/^Training · Day 2 · \d+ min$/).textContent())!.match(/(\d+) min/)![1]);
+  await page.getByRole("button", { name: /^Mark .* done$/ }).first().click();
+  await page.reload(); // checklist progress survives a reload
+  await expect(page.getByRole("button", { name: /^Mark .* not done$/ })).toHaveCount(1);
+
+  // A sore check-in makes today lighter, with an explanation and an override.
+  await page.goto("/wellness");
+  await page.getByRole("button", { name: "Check in now" }).click();
+  await page.getByRole("button", { name: "Soreness 4 of 5" }).click();
+  await page.getByRole("button", { name: "Save check-in" }).click();
+  await expect(page.getByText(/Check-in saved/)).toBeVisible();
+  await page.goto("/program");
+  await expect(page.locator("main")).toContainText("Lighter today because soreness is 4/5");
+  const light = Number((await page.getByText(/^Training · Day 2 · \d+ min$/).textContent())!.match(/(\d+) min/)![1]);
+  expect(light).toBeLessThan(full);
+  await page.getByRole("button", { name: "Use the full session" }).click();
+  await expect(page.getByText(new RegExp(`^Training · Day 2 · ${full} min$`))).toBeVisible();
+
+  await page.goto("/");
+  await expect(page.getByRole("link", { name: /90-day program/ })).toBeVisible();
+  await noHorizontalOverflow(page);
+});

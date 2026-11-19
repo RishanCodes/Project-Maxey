@@ -8,7 +8,7 @@
  */
 import { z } from "zod";
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export const DateKey = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use a YYYY-MM-DD date");
 export const TimeKey = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use a HH:MM time");
@@ -318,10 +318,78 @@ export const ActiveTimer = z.object({
 });
 export type ActiveTimer = z.infer<typeof ActiveTimer>;
 
+/* ---------- 90-day program ---------- */
+export const SKILLS = ["handles", "shooting", "finishing", "explosiveness", "defense", "iq", "conditioning", "strength"] as const;
+export type Skill = (typeof SKILLS)[number];
+
+export const ProgramProfile = z.object({
+  goal: z.string().max(300),
+  position: z.enum(["guard", "wing", "big", "unsure"]),
+  experience: z.enum(["beginner", "jv", "varsity", "advanced"]),
+  age: z.enum(["u13", "13-15", "16-18", "18+"]),
+  /** In priority order, 1 to 3. */
+  focus: z.array(z.enum(SKILLS)).min(1, "Pick at least one focus").max(3),
+  /** Self-rating 1 (just starting) to 5 (a real strength). */
+  ratings: z.record(z.string(), z.number().int().min(1).max(5)),
+  days: Weekdays.min(2, "Pick at least two training days"),
+  minutes: z.number().int().min(15).max(120),
+  practiceDays: Weekdays,
+  hoop: z.boolean(),
+  court: z.boolean(),
+  gym: z.boolean(),
+  partner: z.boolean(),
+  injuries: z.array(z.enum(["knees", "ankles", "back", "shoulder"])).max(4),
+});
+export type ProgramProfile = z.infer<typeof ProgramProfile>;
+
+export const Program = z.object({
+  id: Id,
+  startDate: DateKey,
+  status: z.enum(["active", "paused", "completed", "ended"]),
+  profile: ProgramProfile,
+  /** Paused stretches don't count toward the 90 days. `to` is the resume date (exclusive). */
+  pauses: z.array(z.object({ from: DateKey, to: DateKey.optional() })).max(50),
+  endedAt: Iso.optional(),
+  ...Stamps,
+});
+export type Program = z.infer<typeof Program>;
+
+export const ProgramLog = z.object({
+  id: Id, // pl:<programId>:<date>
+  programId: Id,
+  date: DateKey,
+  day: z.number().int().min(1).max(200),
+  status: z.enum(["done", "partial", "skipped"]),
+  kind: z.enum(["train", "light", "recovery", "test"]),
+  minutes: z.number().int().min(0).max(600),
+  effort: z.number().int().min(1).max(10).optional(),
+  feel: z.enum(["easy", "right", "hard"]).optional(),
+  skipReason: z.enum(["busy", "sore", "sick", "no_access", "other"]).optional(),
+  skills: z.array(z.enum(SKILLS)).max(8),
+  drillsDone: z.number().int().min(0).max(60),
+  drillsTotal: z.number().int().min(0).max(60),
+  trainingId: Id.optional(),
+  note: z.string().max(1000),
+  ...Stamps,
+});
+export type ProgramLog = z.infer<typeof ProgramLog>;
+
+export const Benchmark = z.object({
+  id: Id, // bm:<programId>:<testId>:<round>
+  programId: Id,
+  testId: z.string().min(1).max(40),
+  round: z.number().int().min(0).max(3),
+  value: z.number().min(0).max(100000),
+  date: DateKey,
+  ...Stamps,
+});
+export type Benchmark = z.infer<typeof Benchmark>;
+
 /* ---------- backup file ---------- */
 export const TABLES = [
   "prefs", "answers", "tasks", "taskCompletions", "habits", "habitCompletions", "routines", "routineCompletions",
   "goals", "milestones", "training", "checkins", "meals", "focus", "journal", "xp", "achievements", "coach",
+  "programs", "programLogs", "benchmarks",
 ] as const;
 export type TableName = (typeof TABLES)[number];
 
@@ -344,6 +412,10 @@ export const BackupData = z.object({
   xp: z.array(XpEvent),
   achievements: z.array(AchievementUnlock),
   coach: z.array(CoachMessage),
+  // Added in schema 2; older backups simply have none.
+  programs: z.array(Program).default([]),
+  programLogs: z.array(ProgramLog).default([]),
+  benchmarks: z.array(Benchmark).default([]),
 });
 export type BackupData = z.infer<typeof BackupData>;
 

@@ -139,6 +139,20 @@ describe("cloud sync", () => {
     expect(await xpTotal()).toBe(0);
   });
 
+  it("the 90-day program, its logs and test results sync, with session XP counted once", async () => {
+    await on(A);
+    const today = await repo.localToday();
+    const prof = { goal: "", position: "guard" as const, experience: "jv" as const, age: "16-18" as const, focus: ["shooting" as const], ratings: {}, days: [1, 3, 5], minutes: 45, practiceDays: [], hoop: true, court: true, gym: false, partner: false, injuries: [] };
+    const p = await repo.startProgram(prof, today);
+    await repo.logProgramSession(p, { date: today, day: 1, kind: "test", title: "Baseline", skills: ["shooting"], status: "done", minutes: 30, note: "", drills: [], shots: [] });
+    await repo.saveBenchmark(p.id, "t-ft", 0, 12, today);
+    await sync(A); await sync(B);
+    expect((await B.programs.get(p.id))?.status).toBe("active");
+    expect(await B.programLogs.count()).toBe(1);
+    expect((await B.benchmarks.toArray())[0].value).toBe(12);
+    expect(await xpTotal()).toBe(15);
+  });
+
   it("writes applied from the cloud are not echoed back as local changes", async () => {
     await on(A);
     await repo.createTask({ title: "echo?", description: "", tags: [], priority: "low", repeat: { type: "none" } });

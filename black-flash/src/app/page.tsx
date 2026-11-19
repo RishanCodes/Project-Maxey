@@ -1,4 +1,5 @@
 "use client";
+import { ProgramTodayCard } from "@/components/program/today-card";
 import { play } from "@/lib/sound";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -88,6 +89,8 @@ export default function TodayPage() {
         <Eyebrow>{formatDateKey(today, { weekday: "long", month: "short", day: "numeric" })}</Eyebrow>
         <h1 className="mt-2 text-[34px] font-bold leading-[1.05] tracking-tight">{greeting(minutes)}{prefs.name ? `, ${prefs.name}` : ""}.</h1>
       </header>
+
+      <ProgramTodayCard today={today} />
 
       {nothingYet ? (
         <EmptyState icon={<Sparkles size={28} />} title="Build your first day" body="Add one task or habit, or use the plan drafted from your answers."

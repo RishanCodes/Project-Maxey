@@ -2,7 +2,7 @@ import Dexie, { type EntityTable } from "dexie";
 import { installChangeCapture, type OutboxEntry, type SyncMetaEntry } from "./sync/capture";
 import type {
   AchievementUnlock, CoachMessage, DailyCheckin, FocusSession, Goal, Habit, HabitCompletion, JournalEntry, KvEntry,
-  MealEntry, Milestone, OnboardingAnswer, Preferences, Routine, RoutineStepCompletion, Task, TaskCompletion, TrainingSession, XpEvent,
+  MealEntry, Milestone, OnboardingAnswer, Preferences, Program, ProgramLog, Benchmark, Routine, RoutineStepCompletion, Task, TaskCompletion, TrainingSession, XpEvent,
 } from "./schema";
 
 /**
@@ -29,6 +29,9 @@ export class BlackFlashDB extends Dexie {
   xp!: EntityTable<XpEvent, "id">;
   achievements!: EntityTable<AchievementUnlock, "id">;
   coach!: EntityTable<CoachMessage, "id">;
+  programs!: EntityTable<Program, "id">;
+  programLogs!: EntityTable<ProgramLog, "id">;
+  benchmarks!: EntityTable<Benchmark, "id">;
   kv!: EntityTable<KvEntry, "key">;
   outbox!: EntityTable<OutboxEntry, "key">;
   syncMeta!: EntityTable<SyncMetaEntry, "key">;
@@ -61,6 +64,12 @@ export class BlackFlashDB extends Dexie {
       outbox: "key, changedAt",
       syncMeta: "key",
     });
+    // v3: 90-day program.
+    this.version(3).stores({
+      programs: "id, status",
+      programLogs: "id, programId, date",
+      benchmarks: "id, programId",
+    });
     installChangeCapture(this);
   }
 }
@@ -76,4 +85,5 @@ export function setDb(db: BlackFlashDB) { instance = db; }
 export const ALL_TABLES = [
   "prefs", "answers", "tasks", "taskCompletions", "habits", "habitCompletions", "routines", "routineCompletions",
   "goals", "milestones", "training", "checkins", "meals", "focus", "journal", "xp", "achievements", "coach",
+  "programs", "programLogs", "benchmarks",
 ] as const;

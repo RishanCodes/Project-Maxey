@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import { BookOpen, ChartNoAxesColumn, Database, Dumbbell, House, CalendarDays, Menu, MessageCircle, Moon, Plus, Settings, Target, Timer, WifiOff } from "lucide-react";
+import { BookOpen, ChartNoAxesColumn, Database, Dumbbell, Flame, House, CalendarDays, Menu, MessageCircle, Moon, Plus, Settings, Target, Timer, WifiOff } from "lucide-react";
 import { IconButton, Sheet, cx } from "./ui";
 import { Wordmark } from "./logo";
 import { usePrefs } from "@/hooks/use-data";
@@ -15,6 +15,7 @@ const TABS = [
   { href: "/growth", label: "Growth", icon: ChartNoAxesColumn },
 ];
 const MORE = [
+  { href: "/program", label: "90 Days", icon: Flame },
   { href: "/training", label: "Training", icon: Dumbbell },
   { href: "/wellness", label: "Recovery", icon: Moon },
   { href: "/goals", label: "Goals", icon: Target },

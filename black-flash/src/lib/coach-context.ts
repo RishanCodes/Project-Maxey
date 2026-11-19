@@ -7,7 +7,7 @@ export type ContextKey = keyof AiConsent;
 export const CONTEXT_LABEL: Record<ContextKey, string> = { goals: "Goals", habits: "Habits", tasks: "Tasks", training: "Training", wellness: "Wellness", journal: "Journal" };
 
 /** Plain-text summary of only the selected categories within the date range. Shown to the user before sending. */
-export function buildCoachContext(s: Snapshot, journal: JournalEntry[], keys: ContextKey[], today: DateKey, days: number, weekStart: 0 | 1): string {
+export function buildCoachContext(s: Snapshot, journal: JournalEntry[], keys: ContextKey[], today: DateKey, days: number, weekStart: 0 | 1, programText?: string): string {
   const from = addDays(today, -(days - 1));
   const parts: string[] = [`Today is ${today}. Range: ${from} to ${today}.`];
   if (keys.includes("goals")) parts.push("GOALS:\n" + (s.goals.filter((g) => g.status === "active").map((g) => { const p = goalProgress(g, s.milestones); return `- ${g.title}${g.deadline ? ` (by ${g.deadline})` : ""}: ${p.pct ?? "no"}% ${p.source === "manual" ? "(manual)" : `(${p.done}/${p.total} milestones)`}`; }).join("\n") || "none"));
@@ -20,6 +20,7 @@ export function buildCoachContext(s: Snapshot, journal: JournalEntry[], keys: Co
     const tr = trainingInRange(s, from, today);
     const list = s.training.filter((t) => t.date >= from && t.date <= today).sort((a, b) => a.date.localeCompare(b.date));
     parts.push(`TRAINING: ${tr.sessions} completed sessions, ${tr.minutes} min.${tr.attempted ? ` Shots ${tr.made}/${tr.attempted}.` : ""}\n` + list.slice(-20).map((t) => `- ${t.date} ${t.status} ${t.activity}${t.customActivity ? `(${t.customActivity})` : ""} ${t.type} ${t.durationMin}min${t.effort ? ` effort ${t.effort}/10` : ""}${t.focusAreas.length ? ` focus: ${t.focusAreas.join(", ")}` : ""}`).join("\n"));
+    if (programText) parts.push(programText);
   }
   if (keys.includes("wellness")) {
     const w = wellnessSeries(s, from, today);

@@ -8,10 +8,11 @@ import { XP } from "./config";
 import { addDays, browserTimezone, dateInTz, startOfWeek, todayKey, type DateKey } from "./dates";
 import { occurrenceKey, streak } from "./recurrence";
 import {
-  ActiveTimer, DailyCheckin, Goal, Habit, JournalEntry, MealEntry, Milestone, Preferences, Routine, Task, TrainingSession,
-  type HabitCompletion, type XpEvent,
+  ActiveTimer, Benchmark, DailyCheckin, Goal, Habit, JournalEntry, MealEntry, Milestone, Preferences, Program, ProgramLog, Routine, Task, TrainingSession,
+  type HabitCompletion, type ProgramProfile, type ShotRecord, type Skill, type XpEvent,
 } from "./schema";
 import { ACHIEVEMENTS } from "./achievements";
+import { TESTS } from "./program/drills";
 import { SYNC_TABLES, changeClock, outboxKey, type OutboxEntry } from "./sync/capture";
 
 export const newId = (): string =>
@@ -103,6 +104,13 @@ export async function evaluateAchievements(): Promise<string[]> {
   const d = db();
   const prefs = await getPrefs();
   const today = todayKey(prefs.timezone);
+  const [programLogs, benchmarks, programs] = await Promise.all([d.programLogs.toArray(), d.benchmarks.toArray(), d.programs.toArray()]);
+  const better = benchmarks.some((b) => {
+    if (b.round === 0) return false;
+    const base = benchmarks.find((x) => x.programId === b.programId && x.testId === b.testId && x.round === 0);
+    const test = TESTS.find((t) => t.id === b.testId);
+    return !!base && !!test && (test.better === "higher" ? b.value > base.value : b.value < base.value);
+  });
   const [have, taskComps, training, focus, milestones, goals, journal, checkins, habits, habitComps, tasks] = await Promise.all([
     d.achievements.toArray(), d.taskCompletions.count(), d.training.where("status").equals("completed").count(), d.focus.count(),
     d.milestones.toArray(), d.goals.toArray(), d.journal.toArray(), d.checkins.toArray(), d.habits.toArray(), d.habitCompletions.toArray(), d.tasks.count(),
@@ -120,6 +128,9 @@ export async function evaluateAchievements(): Promise<string[]> {
     restDays: checkins.filter((c) => c.restDay).length,
     bestHabitStreak: Math.max(0, ...habits.map((h) => { const s = streak(h, habitComps, today, prefs.weekStart); return s.unit === "day" ? s.value : s.value * 7; })),
     planApproved: !!prefs.onboarding.approvedAt,
+    programSessions: programLogs.filter((l) => l.status !== "skipped").length,
+    programImproved: better,
+    programFinished: programs.some((p) => p.status === "completed") || benchmarks.some((b) => b.round === 3),
   };
   const unlocked: string[] = [];
   for (const a of ACHIEVEMENTS) {
@@ -454,6 +465,115 @@ export async function getAnswers(): Promise<Record<string, unknown>> {
   const all = await db().answers.toArray();
   return Object.fromEntries(all.map((a) => [a.id, a.value]));
 }
+
+/* ---------------- 90-day program ---------------- */
+/** The program shown in the app: the active or paused one, else the most recent. */
+export async function currentProgram(): Promise<Program | undefined> {
+  const all = (await db().programs.toArray()).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  return all.find((p) => p.status === "active" || p.status === "paused") ?? all[0];
+}
+
+/** Starts a new program. Any running program is ended first (its history is kept). */
+export async function startProgram(profile: ProgramProfile, startDate: DateKey): Promise<Program> {
+  return withTx(async () => {
+    const t = nowIso();
+    for (const p of await db().programs.toArray()) if (p.status === "active" || p.status === "paused") await db().programs.put({ ...p, status: "ended", endedAt: t, updatedAt: t });
+    const prog = Program.parse({ id: newId(), startDate, status: "active", profile, pauses: [], createdAt: t, updatedAt: t });
+    await db().programs.put(prog);
+    return prog;
+  });
+}
+
+export async function updateProgramProfile(id: string, patch: Partial<ProgramProfile>): Promise<Program> {
+  const p = await db().programs.get(id);
+  if (!p) throw new Error("Program not found");
+  const next = Program.parse({ ...p, profile: { ...p.profile, ...patch }, updatedAt: nowIso() });
+  await db().programs.put(next);
+  return next;
+}
+
+export async function pauseProgram(id: string, date: DateKey) {
+  const p = await db().programs.get(id);
+  if (!p || p.status !== "active") return;
+  await db().programs.put({ ...p, status: "paused", pauses: [...p.pauses, { from: date }], updatedAt: nowIso() });
+}
+export async function resumeProgram(id: string, date: DateKey) {
+  const p = await db().programs.get(id);
+  if (!p || p.status !== "paused") return;
+  const pauses = p.pauses.map((x, i) => (i === p.pauses.length - 1 && !x.to ? { ...x, to: date > x.from ? date : addDays(x.from, 1) } : x));
+  await db().programs.put({ ...p, status: "active", pauses, updatedAt: nowIso() });
+}
+export async function finishProgram(id: string, status: "completed" | "ended") {
+  const p = await db().programs.get(id);
+  if (!p) return;
+  const t = nowIso();
+  await db().programs.put({ ...p, status, endedAt: t, updatedAt: t });
+  await evaluateAchievements();
+}
+
+export interface ProgramLogInput {
+  date: DateKey; day: number; kind: ProgramLog["kind"]; title: string; skills: Skill[];
+  status: "done" | "partial"; minutes: number; effort?: number; feel?: ProgramLog["feel"];
+  drills: Array<{ name: string; minutes: number; done: boolean }>; shots: Array<Omit<ShotRecord, "id">>; note: string;
+}
+
+/** Logs a program session. It's also saved as a completed training session, so XP, history and charts include it. */
+export async function logProgramSession(program: Program, input: ProgramLogInput): Promise<{ xp: number; log: ProgramLog }> {
+  return withTx(async () => {
+    const id = `pl:${program.id}:${input.date}`;
+    const prev = await db().programLogs.get(id);
+    const focusAreas = Array.from(new Set(input.skills.map((s) => SKILL_FOCUS[s])));
+    const { session, xp } = await saveTraining({
+      id: prev?.trainingId, date: input.date, activity: "basketball", type: "independent", durationMin: Math.max(1, input.minutes),
+      effort: input.effort, focusAreas, notes: `90-day program, day ${input.day}: ${input.title}${input.note ? `\n${input.note}` : ""}`, status: "completed",
+      drills: input.drills.slice(0, 40).map((d) => ({ id: newId(), name: d.name.slice(0, 80), durationMin: d.minutes, done: d.done })),
+      shots: input.shots.filter((x) => x.attempted > 0).slice(0, 20).map((x) => ({ ...x, id: newId(), made: Math.min(x.made, x.attempted) })),
+    });
+    const t = nowIso();
+    const log = ProgramLog.parse({
+      id, programId: program.id, date: input.date, day: input.day, status: input.status, kind: input.kind, minutes: input.minutes,
+      effort: input.effort, feel: input.feel, skills: input.skills, drillsDone: input.drills.filter((d) => d.done).length, drillsTotal: input.drills.length,
+      trainingId: session.id, note: input.note, createdAt: prev?.createdAt ?? t, updatedAt: t,
+    });
+    await db().programLogs.put(log);
+    await evaluateAchievements();
+    return { xp, log };
+  });
+}
+
+export async function skipProgramDay(program: Program, date: DateKey, day: number, kind: ProgramLog["kind"], reason: NonNullable<ProgramLog["skipReason"]>) {
+  const id = `pl:${program.id}:${date}`;
+  const prev = await db().programLogs.get(id);
+  if (prev?.trainingId) await deleteTraining(prev.trainingId);
+  const t = nowIso();
+  await db().programLogs.put(ProgramLog.parse({ id, programId: program.id, date, day, status: "skipped", kind, minutes: 0, skipReason: reason, skills: [], drillsDone: 0, drillsTotal: 0, note: "", createdAt: prev?.createdAt ?? t, updatedAt: t }));
+}
+
+/** Removes a day's log (and its training session and XP). */
+export async function undoProgramLog(programId: string, date: DateKey) {
+  await withTx(async () => {
+    const id = `pl:${programId}:${date}`;
+    const prev = await db().programLogs.get(id);
+    if (prev?.trainingId) await deleteTraining(prev.trainingId);
+    await db().programLogs.delete(id);
+  });
+}
+
+export async function saveBenchmark(programId: string, testId: string, round: number, value: number, date: DateKey): Promise<Benchmark> {
+  const id = `bm:${programId}:${testId}:${round}`;
+  const prev = await db().benchmarks.get(id);
+  const t = nowIso();
+  const b = Benchmark.parse({ id, programId, testId, round, value, date, createdAt: prev?.createdAt ?? t, updatedAt: t });
+  await db().benchmarks.put(b);
+  await evaluateAchievements();
+  return b;
+}
+export async function deleteBenchmark(id: string) { await db().benchmarks.delete(id); }
+
+const SKILL_FOCUS: Record<Skill, string> = {
+  handles: "ball handling", shooting: "shooting", finishing: "finishing", explosiveness: "explosiveness",
+  defense: "defense", iq: "decision-making", conditioning: "conditioning", strength: "conditioning",
+};
 
 /* ---------------- danger zone ---------------- */
 /**

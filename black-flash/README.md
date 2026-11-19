@@ -70,6 +70,7 @@ Updates to the deployed app reach the installed app automatically the next time 
 1. Create a free project at supabase.com.
 2. **SQL Editor →** paste and run `supabase/migrations/20261117000000_black_flash.sql`, then run
    `insert into public.bf_allowlist(email) values ('you@example.com');` (lower-case).
+   Already set up before the 90-day program was added? Run the migration file again (it's safe to re-run) so the new program tables can sync.
 3. **Authentication → Users → Add user → Create new user** with your email (tick auto-confirm).
 4. **Authentication → Sign In / Providers →** turn off **Allow new users to sign up**. Strangers are blocked by the allowlist anyway; this keeps them from creating accounts at all.
 5. **Authentication → Emails → Magic Link** template: make sure the email shows the code, e.g. add `<p>Your code: {{ .Token }}</p>`. The app signs in with that code.

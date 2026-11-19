@@ -8,6 +8,7 @@ import Dexie, { type Transaction } from "dexie";
 export const SYNC_TABLES = [
   "prefs", "answers", "tasks", "taskCompletions", "habits", "habitCompletions", "routines", "routineCompletions",
   "goals", "milestones", "training", "checkins", "meals", "focus", "journal", "xp", "achievements", "coach",
+  "programs", "programLogs", "benchmarks",
 ] as const;
 export type SyncTable = (typeof SYNC_TABLES)[number];
 

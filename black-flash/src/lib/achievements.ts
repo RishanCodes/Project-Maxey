@@ -11,6 +11,9 @@ export interface AchievementContext {
   restDays: number;
   bestHabitStreak: number; // in days (weekly streaks count as 7 per week)
   planApproved: boolean;
+  programSessions?: number;
+  programImproved?: boolean;
+  programFinished?: boolean;
 }
 
 export interface Achievement {
@@ -32,5 +35,9 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: "goal-complete", name: "Goal Reached", description: "Completed every milestone of a goal.", test: (c) => c.goalsDone >= 1 },
   { id: "four-week-reflection", name: "Four-Week Reflection", description: "Wrote journal entries in four different weeks.", test: (c) => c.journalWeeks >= 4 },
   { id: "checkin-week", name: "Checked In", description: "Logged 7 daily check-ins.", test: (c) => c.checkins >= 7 },
+  { id: "program-first", name: "Day One Done", description: "Completed your first 90-day program session.", test: (c) => (c.programSessions ?? 0) >= 1 },
+  { id: "program-twenty", name: "Locked Into the 90", description: "Completed 20 program sessions.", test: (c) => (c.programSessions ?? 0) >= 20 },
+  { id: "program-pr", name: "Measured Growth", description: "Beat your baseline on a program test.", test: (c) => !!c.programImproved },
+  { id: "program-finish", name: "90 Days", description: "Finished a 90-day program with the final test.", test: (c) => !!c.programFinished },
   { id: "rest-respected", name: "Rest Respected", description: "Logged 3 planned rest days. Recovery is part of training.", test: (c) => c.restDays >= 3 },
 ];

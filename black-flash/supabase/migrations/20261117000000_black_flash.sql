@@ -22,7 +22,7 @@ grant execute on function public.bf_is_allowed() to authenticated;
 -- Every synced record, one row per (user, table, id). `data` is the record as stored on the device.
 create table if not exists public.bf_records (
   user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
-  tbl text not null check (tbl in ('prefs','answers','tasks','taskCompletions','habits','habitCompletions','routines','routineCompletions','goals','milestones','training','checkins','meals','focus','journal','xp','achievements','coach')),
+  tbl text not null check (tbl in ('prefs','answers','tasks','taskCompletions','habits','habitCompletions','routines','routineCompletions','goals','milestones','training','checkins','meals','focus','journal','xp','achievements','coach','programs','programLogs','benchmarks')),
   id text not null check (char_length(id) between 1 and 200),
   data jsonb check (data is null or octet_length(data::text) < 262144),
   deleted boolean not null default false,
@@ -31,6 +31,10 @@ create table if not exists public.bf_records (
   primary key (user_id, tbl, id)
 );
 create index if not exists bf_records_pull on public.bf_records (user_id, server_updated_at);
+-- Keep the allowed table list current when this file is re-run on an existing project
+-- (the 90-day program tables were added later).
+alter table public.bf_records drop constraint if exists bf_records_tbl_check;
+alter table public.bf_records add constraint bf_records_tbl_check check (tbl in ('prefs','answers','tasks','taskCompletions','habits','habitCompletions','routines','routineCompletions','goals','milestones','training','checkins','meals','focus','journal','xp','achievements','coach','programs','programLogs','benchmarks'));
 
 -- Last write wins, enforced by the database: an older change never overwrites a newer one.
 create or replace function public.bf_records_lww() returns trigger

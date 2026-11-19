@@ -9,7 +9,7 @@ import type { z } from "zod";
 import { getDb } from "../db";
 import {
   AchievementUnlock, CoachMessage, DailyCheckin, FocusSession, Goal, Habit, HabitCompletion, JournalEntry, MealEntry, Milestone,
-  OnboardingAnswer, Preferences, Routine, RoutineStepCompletion, Task, TaskCompletion, TrainingSession, XpEvent,
+  OnboardingAnswer, Preferences, Program, ProgramLog, Benchmark, Routine, RoutineStepCompletion, Task, TaskCompletion, TrainingSession, XpEvent,
 } from "../schema";
 import { SYNC_TABLES, flushDeferredCapture, markRemote, outboxKey, type OutboxEntry, type SyncTable } from "./capture";
 import { awardXp, reverseXp, evaluateAchievements } from "../repo";
@@ -26,6 +26,7 @@ const SCHEMAS: Record<SyncTable, z.ZodTypeAny> = {
   prefs: Preferences, answers: OnboardingAnswer, tasks: Task, taskCompletions: TaskCompletion, habits: Habit, habitCompletions: HabitCompletion,
   routines: Routine, routineCompletions: RoutineStepCompletion, goals: Goal, milestones: Milestone, training: TrainingSession, checkins: DailyCheckin,
   meals: MealEntry, focus: FocusSession, journal: JournalEntry, xp: XpEvent, achievements: AchievementUnlock, coach: CoachMessage,
+  programs: Program, programLogs: ProgramLog, benchmarks: Benchmark,
 };
 const isSyncTable = (t: string): t is SyncTable => (SYNC_TABLES as readonly string[]).includes(t);
 

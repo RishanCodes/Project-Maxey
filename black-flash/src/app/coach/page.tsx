@@ -10,6 +10,8 @@ import { buildInsights, weeklyReview, type Insight } from "@/lib/insights";
 import { addDays, formatDateKey, formatTime, fromMinutes, plural, toMinutes } from "@/lib/dates";
 import { pct, trainingInRange } from "@/lib/stats";
 import { createHabit, createTask, getAnswers, newId, nowIso } from "@/lib/repo";
+import { useProgram } from "@/hooks/use-program";
+import { programCoachText } from "@/lib/program/engine";
 import { buildCoachContext, CONTEXT_LABEL, extractProposals, type ContextKey, type Proposal } from "@/lib/coach-context";
 import type { CoachMessage, Preferences } from "@/lib/schema";
 import type { Snapshot } from "@/lib/stats";
@@ -125,7 +127,9 @@ function LiveCoach({ status, prefs, snap }: { status: Status; prefs: Preferences
   const [range, setRange] = useState<"7" | "30">("7");
   const [input, setInput] = useState(""); const [busy, setBusy] = useState(false); const [streaming, setStreaming] = useState(""); const [error, setError] = useState("");
   const [preview, setPreview] = useState(false); const [proposal, setProposal] = useState<Proposal | null>(null); const [clear, setClear] = useState(false);
-  const context = buildCoachContext(snap, journal, keys.filter((k) => allowedKeys.includes(k)), today, Number(range), prefs.weekStart);
+  const programCtx = useProgram(today);
+  const programText = programCtx && (programCtx.program.status === "active" || programCtx.program.status === "paused") ? programCoachText(programCtx) : undefined;
+  const context = buildCoachContext(snap, journal, keys.filter((k) => allowedKeys.includes(k)), today, Number(range), prefs.weekStart, programText);
 
   async function send(text: string, prior: CoachMessage[]) {
     setBusy(true); setError(""); setStreaming("");
